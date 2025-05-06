@@ -1,0 +1,151 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "6fa8363be95a8f7ef8357f33447af07c",
+    "entities": [
+      {
+        "tableName": "UserEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `firstname` TEXT, `middlename` TEXT, `lastname` TEXT, `email` TEXT, `username` TEXT, `roleId` TEXT, `roleName` TEXT, `staffNo` TEXT, `officeId` TEXT, `countryId` TEXT, `stateId` TEXT, `cityId` TEXT, `merchantId` TEXT, `businessName` TEXT, `businessEmail` TEXT, `contactPhone` TEXT, `currencyCode` TEXT, `currencyEntity` TEXT, `userTimezone` TEXT, `subscriptionId` TEXT, `businessLogo` TEXT, `branchName` TEXT, `defaultTax` TEXT, `accessToken` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "firstname",
+            "columnName": "firstname",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "middlename",
+            "columnName": "middlename",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastname",
+            "columnName": "lastname",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "roleId",
+            "columnName": "roleId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "roleName",
+            "columnName": "roleName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "staffNo",
+            "columnName": "staffNo",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "officeId",
+            "columnName": "officeId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "countryId",
+            "columnName": "countryId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stateId",
+            "columnName": "stateId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "cityId",
+            "columnName": "cityId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "merchantId",
+            "columnName": "merchantId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "businessName",
+            "columnName": "businessName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "businessEmail",
+            "columnName": "businessEmail",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "contactPhone",
+            "columnName": "contactPhone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "currencyCode",
+            "columnName": "currencyCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "currencyEntity",
+            "columnName": "currencyEntity",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "userTimezone",
+            "columnName": "userTimezone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "subscriptionId",
+            "columnName": "subscriptionId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "businessLogo",
+            "columnName": "businessLogo",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "branchName",
+            "columnName": "branchName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "defaultTax",
+            "columnName": "defaultTax",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "accessToken",
+            "columnName": "accessToken",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6fa8363be95a8f7ef8357f33447af07c')"
+    ]
+  }
+}
