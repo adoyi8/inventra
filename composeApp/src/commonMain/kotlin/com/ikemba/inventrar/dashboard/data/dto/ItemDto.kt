@@ -12,6 +12,7 @@ data class ItemDto(
     @SerialName("image")  val image: String?,
     @SerialName("category_id")  val categoryId: String,
     @SerialName("discount")  val discount: String,
-    @SerialName("vat")  val vat: String
+    @SerialName("vat")  val vat: String,
+    @SerialName("sku")  val sku: String
 
     )

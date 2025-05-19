@@ -18,7 +18,8 @@ fun Item.toItemEntity(): ItemEntity {
         unitPrice = unitPrice,
         categoryId = categoryId,
         discount = discount?.toDouble(),
-        vat = vat.toDouble()
+        vat = vat.toDouble(),
+        sku = sku
     )
 }
 fun ItemEntity.toItem(): Item{
@@ -29,7 +30,8 @@ fun ItemEntity.toItem(): Item{
         unitPrice = unitPrice,
         categoryId = categoryId,
         discount = discount?.toDouble(),
-        vat = vat.toDouble()
+        vat = vat.toDouble(),
+        sku = sku
     )
 }
 fun ItemDto.toItem(): Item{
@@ -41,6 +43,7 @@ fun ItemDto.toItem(): Item{
         categoryId = categoryId,
         discount = discount?.toDouble(),
         vat = vat.toDouble(),
+        sku = sku
     )
 }
 

@@ -679,22 +679,22 @@ class DashboardViewModel(
     }
 
     fun addToCartFromScanner(qrCodeText: String){
-        println("starting 11")
-        if(!qrCodeText.startsWith("xsxy", ignoreCase = true)){
-            println("starting 10")
-
-            showSnackBar("Wrong Input")
-            return
-        }
+       // println("starting 11")
+//        if(!qrCodeText.startsWith("xsxy", ignoreCase = true)){
+//            println("starting 10")
+//
+//            showSnackBar("Wrong Input")
+//            return
+//        }
         println("starting 9")
-        val productId = qrCodeText.subSequence(4,qrCodeText.length)
+        val productId = qrCodeText
         println("starting 6 "+ productId)
         println("starting 5 "+ state.value.allItems.size)
 
         state.value.allItems.forEach {
             println("show " + it.id)
         }
-        val matchedProducts = state.value.allItems.filter { it.id.toString().equals( productId.toString()) }
+        val matchedProducts = state.value.allItems.filter { it.sku.equals( productId.toString()) }
         if(matchedProducts.isEmpty()){
             println("starting 8")
             showSnackBar("Item not found")

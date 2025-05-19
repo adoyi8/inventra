@@ -13,4 +13,5 @@ data class ItemEntity(
     val categoryId: String,
     val discount: Double?,
     val vat: Double = 0.0,
+    val sku: String
 )

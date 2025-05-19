@@ -1,18 +1,7 @@
 package com.ikemba.inventrar.cart.presentation
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -71,7 +60,18 @@ fun CartScreen(viewModel: DashboardViewModel = koinViewModel(), modifier: Modifi
                 }
             }
         }
-        Column(modifier = Modifier.fillMaxWidth().weight(9f).padding(7.dp)) {
+        Box(
+            modifier = Modifier.fillMaxWidth().weight(9f).padding(7.dp)
+
+        ) {
+            val stateVertical = rememberScrollState(0)
+
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .verticalScroll(stateVertical)
+            ) {
+        Column(modifier = Modifier.fillMaxWidth().heightIn(max = 3000.dp, min = 0.dp),) {
             viewModel.state.collectAsStateWithLifecycle().value.cartItems.forEach { item ->
                 Row(
                     Modifier.fillMaxWidth().padding(6.dp).clip(RoundedCornerShape(3.dp)).border(
@@ -122,7 +122,13 @@ fun CartScreen(viewModel: DashboardViewModel = koinViewModel(), modifier: Modifi
                 }
                 }
         }
-
+}
+            VerticalScrollbar(
+                modifier = Modifier.align(Alignment.CenterEnd)
+                    .fillMaxHeight(),
+                adapter = rememberScrollbarAdapter(stateVertical)
+            )
+        }
         Column(modifier = Modifier.fillMaxWidth().weight(4.5f).clip(
             RoundedCornerShape(10.dp)).background(Color.LightGray)
         ){

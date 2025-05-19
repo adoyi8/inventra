@@ -12,7 +12,7 @@ import com.ikemba.inventrar.cart.data.database.PostSalesRequestEntity
 
 @Database(
     entities = [CategoryEntity::class, ItemEntity::class, CartEntity::class, PostSalesRequestEntity::class],
-    version = 7
+    version = 8
 )
 
 
@@ -25,6 +25,6 @@ abstract class ProductDatabase: RoomDatabase() {
     abstract val cartDao: CartDao
     abstract val postSalesRequestDao: PostSalesRequestDao
     companion object {
-        const val DB_NAME = "product2.db"
+        const val DB_NAME = "product3.db"
     }
 }
