@@ -13,6 +13,7 @@ interface ProductRepository {
     suspend fun getProducts(accessToken: String): Result<ProductResponseDto,DataError.Remote>
     suspend fun saveCategory(category: CategoryEntity): EmptyResult<DataError.Local>
     suspend fun saveItem(item: ItemEntity): EmptyResult<DataError.Local>
+    suspend fun clear()
     fun getAllCategory(): Flow<List<CategoryEntity>>
     fun getAllItems(): Flow<List<ItemEntity>>
 }

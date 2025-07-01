@@ -39,7 +39,7 @@ class LoginViewModel(
                         }
                         hideErrorMessageAfterDelay()
                     }
-                    println("Amad "+ userResponse)
+
                 }
                 .onError { error->
                     _state.update {

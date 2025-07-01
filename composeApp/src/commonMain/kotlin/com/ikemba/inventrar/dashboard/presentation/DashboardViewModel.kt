@@ -160,7 +160,9 @@ class DashboardViewModel(
             productRepository.getProducts(Util.accessToken)
                 .onSuccess { productResponse ->
                     if (productResponse.responseCode == 0) {
+                        productRepository.clear()
                         productResponse.product!!.categoryDto!!.forEach {
+
                             productRepository.saveCategory(it.toCategory().toCategoryEntity())
                             productResponse.product?.itemDto?.forEach {
                                 productRepository.saveItem(it.toItem().toItemEntity())
@@ -188,6 +190,7 @@ class DashboardViewModel(
         viewModelScope.launch {
             hideShowConfirmLogout()
             userRepository.deleteAllUsers()
+            onMenuSelected(0)
             NavigationViewModel.navController?.navigate(Route.Login)
 
         }
@@ -227,7 +230,6 @@ class DashboardViewModel(
         _state.update {
             it.copy(selectedMenuIndex = MutableTransitionState(index))
         }
-  //      state.value.selectedMenuIndex.targetState = index
     }
 
     fun addItemToCart(item: Item) {
@@ -538,7 +540,7 @@ class DashboardViewModel(
                     it.copy(showPostSalesDialog = MutableTransitionState(true))
                 }
                 val cart = Cart(items = state.value.cartItems)
-                cart.paymentMethod = state.value.paymentMethod
+                cart.paymentMethod = "cash"
                 cart.reference = Util.generateTransactionReference()
                 val request = cart.toPostSalesRequest()
                 request.is_held = true;
@@ -633,6 +635,7 @@ class DashboardViewModel(
             while (true) {
                 delay(30000)
                 state.value.savedSales.forEach {
+
                     val request = it.toPostSalesRequest()
                     request.is_held = false
                     cartRepository.postCartSales(
@@ -679,13 +682,7 @@ class DashboardViewModel(
     }
 
     fun addToCartFromScanner(qrCodeText: String){
-       // println("starting 11")
-//        if(!qrCodeText.startsWith("xsxy", ignoreCase = true)){
-//            println("starting 10")
-//
-//            showSnackBar("Wrong Input")
-//            return
-//        }
+
         println("starting 9")
         val productId = qrCodeText
         println("starting 6 "+ productId)
@@ -694,7 +691,7 @@ class DashboardViewModel(
         state.value.allItems.forEach {
             println("show " + it.id)
         }
-        val matchedProducts = state.value.allItems.filter { it.sku.equals( productId.toString()) }
+        val matchedProducts = state.value.allItems.filter { it.sku == productId.toString() }
         if(matchedProducts.isEmpty()){
             println("starting 8")
             showSnackBar("Item not found")

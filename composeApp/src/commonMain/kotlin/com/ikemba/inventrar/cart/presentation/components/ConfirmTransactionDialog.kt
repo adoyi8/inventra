@@ -24,7 +24,7 @@ import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ConfirmTransactionDialog(viewModel: DashboardViewModel = koinViewModel(), text: String) {
+fun ConfirmTransactionDialog(viewModel: DashboardViewModel, text: String) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     AnimatedVisibility(visibleState = state.value.showConfirmTransaction) {
         AlertDialog(
@@ -55,7 +55,7 @@ fun ConfirmTransactionDialog(viewModel: DashboardViewModel = koinViewModel(), te
     }
 }
 @Composable
-fun PaymentMethodNotAvailableDialog(viewModel: DashboardViewModel = koinViewModel(), text: String) {
+fun PaymentMethodNotAvailableDialog(viewModel: DashboardViewModel, text: String) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     AnimatedVisibility(visibleState = state.value.showPaymentMethodNotAvailableDialog) {
         AlertDialog(
@@ -82,7 +82,7 @@ fun PaymentMethodNotAvailableDialog(viewModel: DashboardViewModel = koinViewMode
     }
 }
 @Composable
-fun PostingSalesDialog(viewModel: DashboardViewModel = koinViewModel(), text: String) {
+fun PostingSalesDialog(viewModel: DashboardViewModel, text: String) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     AnimatedVisibility(visibleState = state.value.showPostSalesDialog) {
         AlertDialog(

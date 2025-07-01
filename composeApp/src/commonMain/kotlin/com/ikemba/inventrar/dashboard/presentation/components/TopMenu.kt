@@ -21,19 +21,16 @@ import com.ikemba.inventrar.core.presentation.SecondaryColor
 import com.ikemba.inventrar.core.presentation.components.CustomText
 import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import java.awt.SystemColor.menu
 
 
 @Composable
-fun TopMenu(viewModel: DashboardViewModel = koinViewModel()){
+fun TopMenu(viewModel: DashboardViewModel){
     val state = viewModel.state.collectAsStateWithLifecycle()
-    val menu = listOf<MenuItem>(MenuItem("Point of Sale", imageUrl = "", onClick = {}), MenuItem("Paused Orders", imageUrl = "", onClick = {}),
-        MenuItem("Transaction History", imageUrl = "", onClick = {}),
-        MenuItem("Saved Sales", imageUrl = "", onClick = {}),
-        MenuItem("Settings", imageUrl = "", onClick = {})
-    )
+
 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
     Spacer(Modifier.width(10.dp))
-    menu.forEachIndexed { index, menu ->
+    state.value.menu.forEachIndexed { index, menu ->
         Box(
             modifier = Modifier
                 .background(
@@ -42,7 +39,6 @@ Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 )
                 .clickable(onClick = {
                     viewModel.onMenuSelected(index)
-
                 })
                 .padding(8.dp)
         ) {

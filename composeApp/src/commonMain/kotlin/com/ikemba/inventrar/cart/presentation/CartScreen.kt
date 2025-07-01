@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CartScreen(viewModel: DashboardViewModel = koinViewModel(), modifier: Modifier = Modifier){
+fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
     val state = viewModel.state.collectAsStateWithLifecycle()
     Column(modifier = modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)){
 

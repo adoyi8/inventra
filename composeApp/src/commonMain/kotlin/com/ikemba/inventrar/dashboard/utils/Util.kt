@@ -17,6 +17,9 @@ object Util {
     val PAYMENT_METHOD_CARD: String = "card"
     var CURRENCY_CODE: String = ""
     val EXPIRED_TOKEN_MESSAGE = "Expired"
+    val BASE_URL = "http://api.inventrar.com/v1"
+    val USER_SERVICE_URL = "https://4251-105-112-234-32.ngrok-free.app/api/v1/user_service/public"
+    //val BASE_URL = "http://api.ikembatech.com.au/v1"
     var accessToken: String = ""
     fun generateTransactionReference(): String {
         // Get current timestamp

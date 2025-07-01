@@ -44,6 +44,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation("org.usb4java:usb4java:1.3.0")
             implementation(libs.androidx.lifecycle.viewmodel)
@@ -53,7 +54,7 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
             implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
+
             api(libs.koin.core)
 
             implementation(libs.bundles.ktor)
@@ -102,25 +103,88 @@ android {
 }
 
 dependencies {
-    implementation(project(":composeApp"))
+    //implementation(project(":composeApp"))
     debugImplementation(compose.uiTooling)
 }
+
+
+
+
+// ... other configurations ...
 
 compose.desktop {
     application {
         mainClass = "com.ikemba.inventrar.MainKt"
 
+        // Set the application display name here
+      //  name = "Inventrar" // This is the correct property for the application's human-readable name
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.ikemba.inventrar"
+            packageName = "Inventrar" // This is the unique identifier for your application
             packageVersion = "1.0.0"
+
+
+            // Vendor information
+            vendor = "Ikemba"
+
+            // Application description
+            description = "An inventory management application."
+
+            // --- Windows specific configurations for MSI ---
+            windows {
+                // Set the application icon (.ico file)
+                // Place icon.ico in, for example, 'src/main/resources/icon.ico'
+                // Ensure this path is correct relative to your project root.
+                iconFile.set(project.file("src/commonMain/resources/inventra_logo_colored.ico"))
+
+                // To create a desktop shortcut
+                // The shortcut will typically use the 'application.name'
+                shortcut = true
+
+                // To add an entry to the Start Menu
+                menu = true
+                // The menu entry will also typically use 'application.name'
+                menuGroup = "Inventrar Applications" // Optional: specify a menu group
+
+                // For Windows, the 'application.name' is generally used as the product name.
+                // If you need a very specific name for the MSI package itself or in "Add/Remove Programs"
+                // that differs from 'application.name', ensure 'packageName' is appropriate or check if
+                // there are specific overrides, though 'application.name' is the primary source.
+
+                // You might need to specify upgrade UUID if you plan to release updates
+                // upgradeUuid = "YOUR_UNIQUE_GUID_HERE" // Generate a new GUID for your app
+            }
+
+            // --- macOS specific configurations (DMG) ---
+            macOS {
+                // Set the application icon (.icns file)
+                // Place icon.icns in, for example, 'src/main/resources/icon.icns'
+                // iconFile.set(project.file("src/main/resources/icon.icns"))
+
+                // The application name on macOS will be taken from 'application.name'
+                // and often the .app bundle is named accordingly.
+                // bundleID = "com.ikemba.inventrar" // Usually matches nativeDistributions.packageName
+            }
+
+            // --- Linux specific configurations (Deb) ---
+            linux {
+                // Set the application icon (.png file)
+                // Place icon.png in, for example, 'src/main/resources/icon.png'
+                // iconFile.set(project.file("src/main/resources/icon.png"))
+
+                // The application name on Linux will also be taken from 'application.name'.
+                // appCategory = "Utility"
+            }
         }
         buildTypes.release {
             proguard {
                 isEnabled.set(false)  // Disable ProGuard
+                // If you were to enable ProGuard, you would add rules here:
+                // configurationFiles.from(project.file("proguard-rules.pro"))
             }
         }
     }
-
+    // The problematic line "name = "Inventrar"" has been removed from here.
 }
 

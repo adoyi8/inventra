@@ -7,6 +7,7 @@ import com.ikemba.inventrar.cart.domain.PostSalesModel
 import com.ikemba.inventrar.cart.presentation.ReceiptModel
 import com.ikemba.inventrar.dashboard.domain.Category
 import com.ikemba.inventrar.dashboard.domain.Item
+import com.ikemba.inventrar.dashboard.presentation.components.MenuItem
 import com.ikemba.inventrar.user.domain.User
 
 data class DashboardState (
@@ -35,5 +36,11 @@ data class DashboardState (
     val disableShowSavingSalesDialog : Boolean = false,
     val snackBarHostState: SnackbarHostState = SnackbarHostState(),
     val snackBarMessage: String = "",
-    val reference: String = ""
+    val reference: String = "",
+    val menu: List<MenuItem> = listOf<MenuItem>(
+        MenuItem("Point of Sale", imageUrl = ""), MenuItem("Paused Orders", imageUrl = ""),
+        MenuItem("Transaction History", imageUrl = "", ),
+        MenuItem("Saved Sales", imageUrl = ""),
+        MenuItem("Settings", imageUrl = "",)
+    )
     )

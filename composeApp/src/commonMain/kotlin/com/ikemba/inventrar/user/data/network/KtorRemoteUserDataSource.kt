@@ -4,6 +4,8 @@ import com.ikemba.inventrar.core.data.dto.ResponseDto
 import com.ikemba.inventrar.core.data.safeCall
 import com.ikemba.inventrar.core.domain.DataError
 import com.ikemba.inventrar.core.domain.Result
+import com.ikemba.inventrar.dashboard.utils.Util.BASE_URL
+import com.ikemba.inventrar.dashboard.utils.Util.USER_SERVICE_URL
 import com.ikemba.inventrar.dashboard.utils.Util.accessToken
 import com.ikemba.inventrar.user.data.dto.ChangePasswordRequest
 import com.ikemba.inventrar.user.data.dto.LoginRequest
@@ -18,8 +20,9 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
-private const val BASE_URL = "https://api.ikembatech.com.au/v1"
 
 class KtorRemoteUserDataSource(
     private val httpClient: HttpClient
@@ -31,7 +34,7 @@ class KtorRemoteUserDataSource(
     ): Result<UserResponseDto, DataError.Remote> {
         return safeCall<UserResponseDto> {
             httpClient.get(
-                urlString = "$BASE_URL/search.json"
+                urlString = "$USER_SERVICE_URL/search.json"
             ) {
                 parameter("q", query)
                 parameter("limit", resultLimit)
@@ -40,16 +43,14 @@ class KtorRemoteUserDataSource(
             }
         }
     }
+    @OptIn(ExperimentalEncodingApi::class)
     override suspend fun login(username: String, password: String): Result<UserLoginResponseDto, DataError.Remote> {
         val response = safeCall<UserLoginResponseDto> {
             httpClient.post(
-                urlString = "${BASE_URL}/login/"
+                urlString = "${USER_SERVICE_URL}/employee-login"
             ){
                 contentType(ContentType.Application.Json)
-                setBody(LoginRequest(username, password)
-
-
-                )
+                setBody(LoginRequest(emailAddress = username, password=Base64.encode(password.toByteArray()),ipAddress ="081343902049", deviceUsedToLogin = "ssds", countryOfLogin = "Nigeria"))
             }
         }
         println("Ars "+ response.toString())

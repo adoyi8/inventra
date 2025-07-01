@@ -1,4 +1,9 @@
+import com.ikemba.inventrar.cart.data.mappers.toReceipt
 import com.ikemba.inventrar.cart.presentation.ReceiptModel
+import com.ikemba.inventrar.dashboard.utils.Util
+import com.ikemba.inventrar.dashboard.utils.Util.currencyFormat
+import com.ikemba.inventrar.printer.EscPos
+import com.ikemba.inventrar.printer.generateBarcodeCommands
 import org.usb4java.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -36,76 +41,10 @@ data class Receipt(
 }
 
 // --- ESC/POS Command Placeholders ---
-object EscPos {
-    const val INIT = "\u001B@" // Initialize printer
-    const val CUT = "\u001DV\u0000" // Full cut
-    fun lineFeed(n: Int = 1) = "\n".repeat(n)
-    const val BOLD_ON = "\u001BE\u0001"
-    const val BOLD_OFF = "\u001BE\u0000"
-    const val ALIGN_LEFT = "\u001Ba\u0000"
-    const val ALIGN_CENTER = "\u001Ba\u0001"
-    const val ALIGN_RIGHT = "\u001Ba\u0002"
-    const val NORMAL_SIZE = "\u001D!\u0000"
-    const val DOUBLE_HEIGHT = "\u001D!\u0001"
-    const val DOUBLE_WIDTH = "\u001D!\u0010"
-    const val DOUBLE_SIZE = "\u001D!\u0011"
 
-    // --- QR Code Commands (Common ESC/POS Sequences) ---
-    // Function 165: Select QR Code Model
-    // m = 49 (Model 1), 50 (Model 2 - preferred), 51 (Micro QR)
-    // We'll use Model 2. pLpH is for "1A20" (hex values of arguments)
-    const val QR_MODEL_2 = "\u001D(k\u0004\u0000\u0031\u0041\u0032\u0000"
-
-    // Function 167: Set QR Code Module Size (dot size)
-    // n = 1 to 16. Let's use 4 for a decent size. pLpH for "1C<size>"
-    fun qrSetSize(size: Byte = 4): String {
-        // pL, pH, cn, fn, n
-        // <pL> = 3 (fixed length for this function's parameters)
-        // <pH> = 0
-        // <cn> = 49 ('1')
-        // <fn> = 67 ('C')
-        // <n> = size (e.g., 3, 4, 5)
-        return "\u001D(k\u0003\u0000\u0031\u0043${size.toChar()}"
-    }
-
-    // Function 169: Set QR Code Error Correction Level
-    // n = 48 (L:7%), 49 (M:15%), 50 (Q:25%), 51 (H:30%)
-    // We'll use Level M (15%). pLpH for "1E<level>"
-    fun qrSetErrorCorrection(level: Byte = 49): String { // Default to Level M
-        // pL, pH, cn, fn, n
-        // <pL> = 3
-        // <pH> = 0
-        // <cn> = 49 ('1')
-        // <fn> = 69 ('E')
-        // <n> = level
-        return "\u001D(k\u0003\u0000\u0031\u0045${level.toChar()}"
-    }
-
-    // Function 180: Store QR Code Data in Symbol Storage
-    // m = 48 ('0')
-    // d1...dk = data
-    // pL pH = (length of data d1...dk) + 3
-    fun qrStoreData(data: String): String {
-        val dataBytes = data.toByteArray(Charsets.ISO_8859_1) // Use an encoding printer likely supports for QR data
-        val len = dataBytes.size + 3
-        val pL = (len % 256).toByte()
-        val pH = (len / 256).toByte()
-        // GS ( k <pL> <pH> <cn> <fn> <m> d1...dk
-        // cn = 49 ('1'), fn = 80 ('P'), m = 48 ('0')
-        return "\u001D(k${pL.toChar()}${pH.toChar()}\u0031\u0050\u0030$data"
-    }
-
-    // Function 181: Print QR Code Symbol from Storage
-    // m = 48 ('0')
-    // pLpH for "1Q0"
-    const val QR_PRINT = "\u001D(k\u0003\u0000\u0031\u0051\u0030"
-
-    // It's crucial to convert these strings to bytes using the printer's supported encoding.
-    // Example: EscPos.INIT.toByteArray(Charset.forName("CP437"))
-}
 
 // --- Receipt Formatter ---
-class ReceiptFormatter(private val paperWidthChars: Int = 48) { // Adjust for your printer
+class ReceiptFormatter(private val paperWidthChars: Int = 200) { // Adjust for your printer
     private fun center(text: String): String {
         val padding = (paperWidthChars - text.length) / 2
         return " ".repeat(maxOf(0, padding)) + text
@@ -129,12 +68,64 @@ class ReceiptFormatter(private val paperWidthChars: Int = 48) { // Adjust for yo
         return sb.toString()
     }
 
+
+// You would need to define constants in your EscPos object/class:
+// object EscPos {
+//     // ... other commands
+//     const val ALIGN_CENTER = "\u001BA\u0001"
+//     const val ALIGN_LEFT = "\u001BA\u0000"
+//     const val LINE_FEED = "\n"
+//     fun lineFeed(lines: Int): String = LINE_FEED.repeat(lines)
+
+//     // --- Barcode Specific Commands (EXAMPLES - VERIFY WITH YOUR PRINTER/LIBRARY) ---
+//     // HRI position: GS H n (n=0,1,2,3)
+//     fun barcodeSetHriPosition(position: Int): String = "\u001D\u0048${position.toChar()}"
+
+//     // Barcode height: GS h n (n=1-255)
+//     fun barcodeSetHeight(height: Int): String = "\u001D\u0068${height.toChar()}"
+
+//     // Barcode width: GS w n (n=2-6 for narrow bar width)
+//     fun barcodeSetWidth(width: Int): String = "\u001D\u0077${width.toChar()}"
+
+//     // Barcode systems (examples, 'm' value for GS k m ...)
+//     const val BARCODE_TYPE_UPC_A: Int = 65
+//     const val BARCODE_TYPE_UPC_E: Int = 66
+//     const val BARCODE_TYPE_EAN13: Int = 67
+//     const val BARCODE_TYPE_EAN8: Int = 68
+//     const val BARCODE_TYPE_CODE39: Int = 69
+//     const val BARCODE_TYPE_ITF: Int = 70
+//     const val BARCODE_TYPE_CODABAR: Int = 71
+//     const val BARCODE_TYPE_CODE93: Int = 72
+//     const val BARCODE_TYPE_CODE128: Int = 73
+
+//     // Hypothetical function to select system (might not exist, could be part of printBarcode)
+//     fun selectBarcodeSystem(system: Int): String = "" // Placeholder, often part of printBarcode command
+
+//     // Function to print barcode: GS k m d1...dk NUL or GS k m n d1...dn
+//     // This is highly dependent on the printer and library.
+//     // A common pattern for CODE128 (m=73): <GS>kI<len_byte><{B><data>
+//     // The "{B" tells the printer to use CODE128 Code B character set.
+//     fun barcodePrint(data: String, type: Int = BARCODE_TYPE_CODE128): String {
+//         return when (type) {
+//             BARCODE_TYPE_CODE128 -> {
+//                 // For CODE128, the data might need to be prefixed with a mode char like '{B'
+//                 // and the length of the data (including the mode char) is often required.
+//                 val code128Data = "{B$data" // Example for Code B
+//                 "\u001D\u006B${type.toChar()}${code128Data.length.toChar()}$code128Data"
+//             }
+//             // Add other barcode types here
+//             else -> "" // Or throw an error for unsupported type
+//         }
+//     }
+//      const val NULL_TERMINATOR = "\u0000"
+// }
+
     fun formatReceipt(receipt: ReceiptModel, qrCodeData: String?): String {
         val sb = StringBuilder()
         sb.append(EscPos.INIT)
         sb.append(EscPos.ALIGN_CENTER)
         sb.append(EscPos.DOUBLE_SIZE)
-        sb.append("Chidinobi Farms\n")
+        sb.append(receipt.businessName+"\n")
         sb.append(EscPos.NORMAL_SIZE)
         sb.append( receipt.address+ "\n")
         sb.append(EscPos.BOLD_ON)
@@ -142,23 +133,23 @@ class ReceiptFormatter(private val paperWidthChars: Int = 48) { // Adjust for yo
         sb.append(EscPos.BOLD_OFF)
         sb.append(EscPos.lineFeed())
         sb.append(EscPos.ALIGN_LEFT)
-        sb.append("Order No: ${receipt.reference}\n")
+
         sb.append(twoColumn("Invoice: ${receipt.reference}", "${receipt.date} ${receipt.time}\n"))
         sb.append("-".repeat(paperWidthChars) + "\n")
-        val itemColWidth = paperWidthChars - 10 - 5 - 10 - 2
-        sb.append(
+        val itemColWidth =23
+        sb.append(EscPos.ALIGN_LEFT,
             String.format(
-                "%-${itemColWidth}s %-8s %3s %9s\n",
-                "Item", "Price(\$)", "Qty", "Total(\$)"
+                "%-${itemColWidth}s %-9s %-3s %-9s\n",
+                "Item", "Price(${Util.CURRENCY_CODE})", "Qty", "Total(${Util.CURRENCY_CODE})"
             )
         )
         receipt.cartItems.forEach { item ->
             val priceStr = String.format("%.2f", item.price)
             val totalStr = String.format("%.2f", item.getSubTotal())
-            sb.append(
+            sb.append(EscPos.ALIGN_LEFT,
                 item.itemName?.let {
                     String.format(
-                        "%-${itemColWidth}s %8s %3d %9s\n",
+                        "%-${itemColWidth}s %-9s %-3d %-9s\n",
                         it.take(itemColWidth),
                         priceStr,
                         item.quantity,
@@ -169,28 +160,30 @@ class ReceiptFormatter(private val paperWidthChars: Int = 48) { // Adjust for yo
         }
         sb.append("-".repeat(paperWidthChars) + "\n")
         sb.append(EscPos.ALIGN_RIGHT)
-        sb.append(twoColumn("Subtotal", String.format("\$%.2f", receipt.subTotal) + "\n"))
-        sb.append(twoColumn("Discount", String.format("\$%.2f", receipt.discount) + "\n"))
-        sb.append(twoColumn("TAX", String.format("\$%.2f", receipt.taxTotal) + "\n"))
+        sb.append(EscPos.ALIGN_LEFT, twoColumn("Subtotal", currencyFormat(receipt.subTotal) + "\n"))
+        sb.append(EscPos.ALIGN_LEFT,twoColumn("Discount", currencyFormat(receipt.discount) + "\n"))
+        sb.append(EscPos.ALIGN_LEFT,twoColumn("TAX", currencyFormat(receipt.taxTotal) + "\n"))
         sb.append(EscPos.BOLD_ON)
         sb.append(EscPos.DOUBLE_HEIGHT)
-        sb.append(twoColumn("TOTAL", String.format("\$%.2f", receipt.grandTotal) + "\n"))
+        sb.append(EscPos.ALIGN_LEFT,twoColumn("TOTAL", currencyFormat(receipt.grandTotal) + "\n"))
         sb.append(EscPos.NORMAL_SIZE)
         sb.append(EscPos.BOLD_OFF)
+        sb.append(EscPos.lineFeed(1))
+        sb.append(EscPos.ALIGN_LEFT,"Cashier: ${receipt.cashier}\n")
         sb.append(EscPos.lineFeed(2))
 
         // --- Add QR Code ---
         if (qrCodeData != null) {
-            sb.append(generateQrCodeCommands(qrCodeData))
+            sb.append(generateBarcodeCommands(qrCodeData))
             sb.append(EscPos.ALIGN_CENTER) // Re-center for footer if needed, or remove if QR is last
             sb.append("Scan for contact or promotions!\n") // Optional text
         }
         // --- End QR Code ---
 
         sb.append(EscPos.ALIGN_CENTER)
-        sb.append("Powered by Inventra\n")
-        sb.append("Have a nice day!\n")
-        sb.append(EscPos.lineFeed(3))
+        sb.append("Powered by Inventrar\n")
+        sb.append("Have a nice day!\n\n\n")
+        sb.append(EscPos.lineFeed(5))
         sb.append(EscPos.CUT)
         return sb.toString()
     }
@@ -418,7 +411,7 @@ fun printReceiptGem(receiptModel: ReceiptModel) {
 
 
             // 2. Format the receipt
-            val formatter = ReceiptFormatter(paperWidthChars = 42) // Common for 80mm, adjust if needed
+            val formatter = ReceiptFormatter(paperWidthChars = 48) // Common for 80mm, adjust if needed
             val receiptString = formatter.formatReceipt(receiptModel, qrCodeEmail)
 
             println("\n--- Generated ESC/POS Style Commands (String Representation) ---")
