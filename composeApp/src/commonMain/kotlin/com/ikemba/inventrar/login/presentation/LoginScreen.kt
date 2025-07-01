@@ -59,7 +59,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginScreenRoot(
-    viewModel: LoginViewModel = koinViewModel<LoginViewModel>(),
+    viewModel: LoginViewModel,
 ){
 
     val state by viewModel.state.collectAsStateWithLifecycle()

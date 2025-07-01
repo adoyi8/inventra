@@ -6,6 +6,7 @@ import com.ikemba.inventrar.core.data.dto.ResponseDto
 import com.ikemba.inventrar.core.data.safeCall
 import com.ikemba.inventrar.core.domain.DataError
 import com.ikemba.inventrar.core.domain.Result
+import com.ikemba.inventrar.dashboard.utils.Util.BASE_URL
 import com.ikemba.inventrar.heldOrder.data.dto.VoidOrderRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
@@ -18,7 +19,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
-private const val BASE_URL = "https://api.ikembatech.com.au/v1"
+
 class KtorRemoteCartDataSource(
     private val httpClient: HttpClient
 ): RemoteCartDataSource {

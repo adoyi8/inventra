@@ -3,6 +3,7 @@ package com.ikemba.inventrar.cart.presentation
 import com.ikemba.inventrar.cart.domain.CartItem
 
 data class ReceiptModel(
+
     var address: String = "",
     var reference: String = "",
     var date: String = "",
@@ -17,5 +18,6 @@ data class ReceiptModel(
     var taxTotal: Double = 0.0,
     var grandTotal: Double =0.0,
     var logo: String? = null,
-    var cartItems: MutableList<CartItem> = mutableListOf()
+    var cartItems: MutableList<CartItem> = mutableListOf(),
+    var businessName: String = ""
 )

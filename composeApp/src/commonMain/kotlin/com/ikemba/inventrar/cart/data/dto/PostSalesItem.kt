@@ -10,6 +10,7 @@ data class PostSalesItem(
     var qty: String,
     var subtotal: Double,
     var vat_rate: Double,
-    var vat_amount: Double
+    var vat_amount: Double,
+    var discount: String? = "0.0"
 
 )

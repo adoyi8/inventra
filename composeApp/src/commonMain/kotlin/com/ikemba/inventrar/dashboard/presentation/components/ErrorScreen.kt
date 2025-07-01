@@ -18,7 +18,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
-fun SavingSalesDialog(viewModel: DashboardViewModel = koinViewModel()) {
+fun SavingSalesDialog(viewModel: DashboardViewModel) {
 
     val state = viewModel.state.collectAsStateWithLifecycle()
     AnimatedVisibility(visibleState = state.value.showSavingSalesDialog) {

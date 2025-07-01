@@ -30,7 +30,7 @@ fun Cart.toPostSalesRequest(): PostSalesRequest {
     result.total_vat = this.getTotalVat()
     result.grandTotal = this.getGrandTotal()
     result.cart = this.items.map {
-        PostSalesItem(product_id = it.itemId!!.toInt(), product_name = it.itemName, qty = it.quantity.toString(),subtotal = it.getSubTotal(), vat_rate = it.returnVatRate(), vat_amount = it.getVatAmount())
+        PostSalesItem(product_id = it.itemId!!.toInt(), product_name = it.itemName, qty = it.quantity.toString(),subtotal = it.getSubTotal(), vat_rate = it.returnVatRate(), vat_amount = it.getVatAmount(), discount = it.discount.toString())
     }
     return result
 
@@ -85,7 +85,8 @@ fun PostSalesModel.toPostSalesRequest(): PostSalesRequest {
             qty = it.qty,
             subtotal = it.subtotal,
             vat_rate = it.vat_rate,
-            vat_amount = it.vat_amount
+            vat_amount = it.vat_amount,
+
         )
     }
     return result;

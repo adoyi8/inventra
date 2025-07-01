@@ -51,5 +51,10 @@ class DefaultProductRepository(
     override fun getAllItems(): Flow<List<ItemEntity>> {
         return productDao.getAllAllItems()
     }
+override suspend fun clear(){
+    productDao.deleteAllCategories()
+    productDao.deleteAllProducts()
+
+    }
 
 }

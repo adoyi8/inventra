@@ -59,22 +59,17 @@ import inventrar.composeapp.generated.resources.Res
 import inventrar.composeapp.generated.resources.inventra_logo_and_text
 import inventrar.composeapp.generated.resources.logout
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun POScreen(viewModel: DashboardViewModel) {
 
 
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(true){
-//      state.selectedMenuIndex.currentState == 0
-  //      viewModel.hideChangePasswordDialog()
-    }
     Scaffold() {
-        Box(modifier = Modifier.fillMaxSize()) {
-
-
+        Box(modifier = Modifier.fillMaxSize()){
             Column(modifier = Modifier.fillMaxSize()) {
 
                 // Top Bar
@@ -93,21 +88,21 @@ fun POScreen(viewModel: DashboardViewModel) {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
-                            TopMenu()
+                            TopMenu(viewModel)
 
 
-                            if (state.users.isNotEmpty()) {
+                            if (state.value.users.isNotEmpty()) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     ProfileImage(
-                                        imageUrl = state.users.first().businessLogo,
+                                        imageUrl = state.value.users.first().businessLogo,
                                         content = {}
                                     )
                                     Column {
                                         CustomText(
-                                            state.users.first().getFullName(),
+                                            state.value.users.first().getFullName(),
                                             color = Color.White
                                         )
                                     }
@@ -132,7 +127,7 @@ fun POScreen(viewModel: DashboardViewModel) {
                                             modifier = Modifier.size(43.dp).padding(start = 8.dp)
                                                 .clickable(
                                                     onClick = { viewModel.showShowConfirmLogout() },
-                                                    enabled = state.users.isNotEmpty()
+                                                    enabled = state.value.users.isNotEmpty()
                                                 )
                                         )
                                     }
@@ -145,49 +140,48 @@ fun POScreen(viewModel: DashboardViewModel) {
                 )
 
                 AnimatedVisibility(
-                    visible = state.selectedMenuIndex.currentState == 0,
+                    visible = state.value.selectedMenuIndex.currentState == 0,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Row(modifier = Modifier.fillMaxWidth()) {
-
-                            POSSCreenBody(state = state, modifier = Modifier.weight(12f))
-                            CartScreen(modifier = Modifier.weight(8f))
+                            POSSCreenBody(viewModel = viewModel, modifier = Modifier.weight(12f))
+                            CartScreen(viewModel = viewModel,modifier = Modifier.weight(8f))
                         }
-                        ConfirmTransactionDialog(text = "Are you sure you want to proceed")
-                        PaymentMethodNotAvailableDialog(text = "Are you sure you want to proceed")
-                        PostingSalesDialog(text = "Please wait...")
+                        ConfirmTransactionDialog(viewModel = viewModel,text = "Are you sure you want to proceed")
+                        PaymentMethodNotAvailableDialog(viewModel = viewModel,text = "Are you sure you want to proceed")
+                        PostingSalesDialog(viewModel = viewModel,text = "Please wait...")
 
                         val onDismiss = {
                             viewModel.toggleShowReceipt(false)
                         }
-                        ReceiptDialog(state.showReceipt, onDismiss, state.receiptModel)
+                        ReceiptDialog(state.value.showReceipt, onDismiss, state.value.receiptModel)
                     }
                 }
                 AnimatedVisibility(
-                    visible = state.selectedMenuIndex.currentState == 1,
+                    visible = state.value.selectedMenuIndex.currentState == 1,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
-                    HeldOrderScreen()
+                    HeldOrderScreen(dashboardViewModel =viewModel )
                 }
                 AnimatedVisibility(
-                    visible = state.selectedMenuIndex.currentState == 2,
+                    visible = state.value.selectedMenuIndex.currentState == 2,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
                     TransactionScreen()
                 }
                 AnimatedVisibility(
-                    visible = state.selectedMenuIndex.currentState == 3,
+                    visible = state.value.selectedMenuIndex.currentState == 3,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
-                    SavedSalesScreen()
+                    SavedSalesScreen(viewModel = viewModel)
                 }
                 AnimatedVisibility(
-                    visible = state.selectedMenuIndex.currentState == 4,
+                    visible = state.value.selectedMenuIndex.currentState == 4,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
@@ -195,7 +189,7 @@ fun POScreen(viewModel: DashboardViewModel) {
                 }
                 ConfirmLogout(viewModel = viewModel)
                 ChangePasswordDialog(viewModel= viewModel)
-                SavingSalesDialog()
+                SavingSalesDialog(viewModel = viewModel)
 
             }
             SnackbarHost(hostState = viewModel.state.value.snackBarHostState, modifier = Modifier.align(Alignment.Center))

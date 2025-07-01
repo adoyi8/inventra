@@ -70,7 +70,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SavedSalesScreen(viewModel: DashboardViewModel = koinViewModel()) {
+fun SavedSalesScreen(viewModel: DashboardViewModel) {
     var selectedEntries by remember { mutableStateOf("10") }
     var selectedDateRange by remember { mutableStateOf("Select Date Range") }
     var showDateRangeDropDown = MutableTransitionState(false)
@@ -171,7 +171,7 @@ fun SavedSalesScreen(viewModel: DashboardViewModel = koinViewModel()) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    HeldOrderTransactionTable()
+                    HeldOrderTransactionTable(viewModel = viewModel)
 
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -213,7 +213,7 @@ fun HeldOrderSearchBar(searchText: String, onSearchTextChanged: (String) -> Unit
 }
 
 @Composable
-fun HeldOrderTransactionTable(viewModel: DashboardViewModel = koinViewModel()) {
+fun HeldOrderTransactionTable(viewModel: DashboardViewModel) {
 
     val state = viewModel.state.collectAsStateWithLifecycle()
 

@@ -88,7 +88,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
-fun HeldOrderScreen(viewModel: HeldOrderViewModel = koinViewModel()) {
+fun HeldOrderScreen(viewModel: HeldOrderViewModel = koinViewModel(),dashboardViewModel: DashboardViewModel) {
 
     var selectedDateRange by remember { mutableStateOf("Select Date Range") }
     var showDateRangeDropDown = MutableTransitionState(false)
@@ -217,7 +217,7 @@ fun HeldOrderScreen(viewModel: HeldOrderViewModel = koinViewModel()) {
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        HeldOrderTransactionTable(paginationRequest = paginationRequest)
+                        HeldOrderTransactionTable(viewModel = viewModel,paginationRequest = paginationRequest, dashboardViewModel =dashboardViewModel )
 
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -278,7 +278,7 @@ fun HeldOrderSearchBar(viewModel: HeldOrderViewModel = koinViewModel(), paginati
 }
 
 @Composable
-fun HeldOrderTransactionTable(viewModel: HeldOrderViewModel = koinViewModel(), dashboardViewModel: DashboardViewModel = koinViewModel(), paginationRequest: MutableState<PaginationRequest>) {
+fun HeldOrderTransactionTable(viewModel: HeldOrderViewModel, dashboardViewModel: DashboardViewModel, paginationRequest: MutableState<PaginationRequest>) {
 
     val state = viewModel.state.collectAsStateWithLifecycle()
     Box(

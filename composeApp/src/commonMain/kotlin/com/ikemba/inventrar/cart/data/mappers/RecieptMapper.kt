@@ -17,6 +17,7 @@ fun ReceiptResponseDto.toReceipt(): ReceiptModel {
         receiptModel.logo = this.data.summary.first().logo
         receiptModel.reference = this.data.summary.first().orderNo
         receiptModel.discount = this.data.summary.first().discountTotal.toDouble()
+        receiptModel.businessName= this.data.summary.first().businessName
 
         this.data.items.forEach {
             val cartItem = CartItem(itemId = it.productId, itemName= it.productName , quantity = it.quantity.toInt(), price = it.unitPrice.toDouble(), vatRate = it.unitVat.toDouble())

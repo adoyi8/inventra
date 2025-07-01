@@ -5,6 +5,7 @@ import com.ikemba.inventrar.core.data.dto.ResponseDto
 import com.ikemba.inventrar.core.data.safeCall
 import com.ikemba.inventrar.core.domain.DataError
 import com.ikemba.inventrar.core.domain.Result
+import com.ikemba.inventrar.dashboard.utils.Util.BASE_URL
 import com.ikemba.inventrar.heldOrder.data.dto.HeldOrderDto
 import com.ikemba.inventrar.heldOrder.data.dto.SingleHeldOrderDto
 import com.ikemba.inventrar.heldOrder.data.dto.VoidOrderRequest
@@ -18,7 +19,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 
 
-private const val BASE_URL = "https://api.ikembatech.com.au/v1"
+
 
 
 class KtorRemoteHeldOrderDataSource(

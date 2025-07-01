@@ -3,24 +3,13 @@ package com.ikemba.inventrar.dashboard.presentation.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -41,10 +30,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikemba.inventrar.core.presentation.PrimaryColor
 import com.ikemba.inventrar.core.presentation.components.CustomText
 import com.ikemba.inventrar.dashboard.domain.Category
@@ -60,8 +51,9 @@ import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
-fun POSSCreenBody(viewModel: DashboardViewModel = koinViewModel(), state: DashboardState, modifier: Modifier = Modifier) {
+fun POSSCreenBody(viewModel: DashboardViewModel, modifier: Modifier = Modifier) {
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     val selectedCategory = remember { mutableStateOf<Category>(Category("1", "1", "1")) }
     var searchValue by remember { mutableStateOf("") }
@@ -135,18 +127,27 @@ fun POSSCreenBody(viewModel: DashboardViewModel = koinViewModel(), state: Dashbo
                     size = 18.sp
                 )
                 // Product List with Animated Appearance
+                val gridState = rememberLazyGridState()
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                                        ) {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(5),
-
+                    state = gridState,
+                    modifier = Modifier.padding(end = 16.dp)
 
                     ) {
                     items(state.visibleItems) { item ->
-                        AnimatedVisibility(visible = true) {
-                            ProductCard(item = item)
-                        }
+                    //////    AnimatedVisibility(visible = true) {
+                            ProductCard(viewModel = viewModel, item = item)
+                        /////}
                     }
                 }
-
+                    VerticalScrollbar(
+                        modifier = Modifier.align(Alignment.CenterEnd).padding(start = 16.dp).fillMaxHeight(),
+                        adapter = rememberScrollbarAdapter(gridState) // <-- Use gridState
+                    )
+            }
             }
         }
         FloatingActionButton({viewModel.getProducts()}, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp), containerColor = PrimaryColor){
@@ -158,11 +159,25 @@ fun POSSCreenBody(viewModel: DashboardViewModel = koinViewModel(), state: Dashbo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductCard(viewModel: DashboardViewModel = koinViewModel(), item: Item) {
+fun ProductCard(viewModel: DashboardViewModel, item: Item) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .clickable {viewModel.addItemToCart(item) }
+           // .clickable {viewModel.addItemToCart(item) }
+            .pointerInput(item) { // Pass item or any key that makes sense to re-trigger this block if item changes
+                detectTapGestures(
+                    onTap = {
+                        println("ProductCard tapped via pointerInput for item: ${item.name}") // For debugging
+                        viewModel.addItemToCart(item)
+                    },
+                    onPress = {
+                        // You can also react to press events if needed
+                        println("ProductCard pressed via pointerInput for item: ${item.name}")
+                        tryAwaitRelease() // Important to wait for release
+                        println("ProductCard released via pointerInput for item: ${item.name}")
+                    }
+                )
+            }
             .animateContentSize(animationSpec = tween(300)),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
