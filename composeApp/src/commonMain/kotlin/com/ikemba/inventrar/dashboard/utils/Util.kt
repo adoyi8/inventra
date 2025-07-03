@@ -18,7 +18,9 @@ object Util {
     var CURRENCY_CODE: String = ""
     val EXPIRED_TOKEN_MESSAGE = "Expired"
     val BASE_URL = "http://api.inventrar.com/v1"
-    val USER_SERVICE_URL = "https://4251-105-112-234-32.ngrok-free.app/api/v1/user_service/public"
+    val REQUEST_TOKEN_ID = "926103425935-1up36j1r082lqvfbv196e97im3mct9jb.apps.googleusercontent.com"  //console
+    val USER_SERVICE_URL = "https://5d83-102-91-78-122.ngrok-free.app/api/v1/user_service/public"
+    val SETTINGS_SERVICE_URL = "https://5d83-102-91-78-122.ngrok-free.app/api/v1/settings_service/public"
     //val BASE_URL = "http://api.ikembatech.com.au/v1"
     var accessToken: String = ""
     fun generateTransactionReference(): String {

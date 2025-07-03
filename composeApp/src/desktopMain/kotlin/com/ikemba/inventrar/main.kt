@@ -11,7 +11,6 @@ import com.ikemba.inventrar.app.App
 import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
 import com.ikemba.inventrar.di.initKoin
 import inventrar.composeapp.generated.resources.Res
-import inventrar.composeapp.generated.resources.inventra_logo
 import inventrar.composeapp.generated.resources.inventra_logo_colored
 import org.jetbrains.compose.resources.painterResource
 

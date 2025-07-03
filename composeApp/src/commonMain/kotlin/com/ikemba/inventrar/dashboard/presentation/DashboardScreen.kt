@@ -5,7 +5,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.TooltipArea
+//import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,15 +23,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
@@ -53,17 +48,17 @@ import com.ikemba.inventrar.dashboard.presentation.components.ProfileImage
 import com.ikemba.inventrar.dashboard.presentation.components.SavingSalesDialog
 import com.ikemba.inventrar.dashboard.presentation.components.TopMenu
 import com.ikemba.inventrar.heldOrder.presentation.HeldOrderScreen
+import com.ikemba.inventrar.login.presentation.UserViewModel
 import com.ikemba.inventrar.savedSales.presentation.SavedSalesScreen
 import com.ikemba.inventrar.transactionHistory.presentation.TransactionScreen
 import inventrar.composeapp.generated.resources.Res
 import inventrar.composeapp.generated.resources.inventra_logo_and_text
 import inventrar.composeapp.generated.resources.logout
 import org.jetbrains.compose.resources.painterResource
-import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun POScreen(viewModel: DashboardViewModel) {
+fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
 
 
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -106,20 +101,20 @@ fun POScreen(viewModel: DashboardViewModel) {
                                             color = Color.White
                                         )
                                     }
-                                    TooltipArea(
-                                        tooltip = {
-                                            // composable tooltip content
-                                            Surface(
-                                                modifier = Modifier.shadow(4.dp),
-                                                shape = RoundedCornerShape(4.dp)
-                                            ) {
-                                                CustomText(
-                                                    text = "Logout",
-                                                )
-                                            }
-                                        }, // in milliseconds
-                                        // tooltip offset
-                                    ) {
+//                                    TooltipArea(
+//                                        tooltip = {
+//                                            // composable tooltip content
+//                                            Surface(
+//                                                modifier = Modifier.shadow(4.dp),
+//                                                shape = RoundedCornerShape(4.dp)
+//                                            ) {
+//                                                CustomText(
+//                                                    text = "Logout",
+//                                                )
+//                                            }
+//                                        }, // in milliseconds
+//                                        // tooltip offset
+//                                    ) {
                                         Icon(
                                             painter = painterResource(Res.drawable.logout),
                                             contentDescription = "Logout",
@@ -130,9 +125,9 @@ fun POScreen(viewModel: DashboardViewModel) {
                                                     enabled = state.value.users.isNotEmpty()
                                                 )
                                         )
-                                    }
+//                                    }
                                 }
-                            }
+                           }
 
                         }
                     },
@@ -187,7 +182,7 @@ fun POScreen(viewModel: DashboardViewModel) {
                 ) {
                 SettingsScreen(viewModel)
                 }
-                ConfirmLogout(viewModel = viewModel)
+                ConfirmLogout(viewModel = userViewModel)
                 ChangePasswordDialog(viewModel= viewModel)
                 SavingSalesDialog(viewModel = viewModel)
 

@@ -20,5 +20,8 @@ sealed interface Route {
     data object POSScreen: Route
 
     @Serializable
+    data object UserProfileRoute: Route
+
+    @Serializable
     data class BookDetail(val id: String): Route
 }

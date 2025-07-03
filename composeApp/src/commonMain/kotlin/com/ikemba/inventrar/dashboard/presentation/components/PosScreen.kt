@@ -143,10 +143,10 @@ fun POSSCreenBody(viewModel: DashboardViewModel, modifier: Modifier = Modifier) 
                         /////}
                     }
                 }
-                    VerticalScrollbar(
-                        modifier = Modifier.align(Alignment.CenterEnd).padding(start = 16.dp).fillMaxHeight(),
-                        adapter = rememberScrollbarAdapter(gridState) // <-- Use gridState
-                    )
+//                    VerticalScrollbar(
+//                        modifier = Modifier.align(Alignment.CenterEnd).padding(start = 16.dp).fillMaxHeight(),
+//                        adapter = rememberScrollbarAdapter(gridState) // <-- Use gridState
+//                    )
             }
             }
         }

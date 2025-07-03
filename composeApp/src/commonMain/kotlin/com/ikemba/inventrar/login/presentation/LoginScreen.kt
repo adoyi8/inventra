@@ -1,5 +1,6 @@
 package com.ikemba.inventrar.login.presentation
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -55,11 +56,14 @@ import inventrar.composeapp.generated.resources.visibility
 import inventrar.composeapp.generated.resources.visibility_off
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
-import org.koin.compose.viewmodel.koinViewModel
+import com.ikemba.inventrar.auth.GoogleAuthUiProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreenRoot(
-    viewModel: LoginViewModel,
+    viewModel: UserViewModel, googleAuthProvider: GoogleAuthUiProvider
 ){
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -78,14 +82,16 @@ fun LoginScreenRoot(
             state = state,
             onAction = { action ->
                 viewModel.onAction(action)
-            }
+            },
+            googleAuthProvider = googleAuthProvider
         )
     }
 }
 @Composable
 fun LoginScreen(
     state: LoginState,
-    onAction: (LoginAction)-> Unit
+    onAction: (LoginAction)-> Unit,
+    googleAuthProvider: GoogleAuthUiProvider
 ) {
 
 
@@ -104,7 +110,7 @@ fun LoginScreen(
             // Left Image Section
             Box(
                 modifier = Modifier
-                    .weight(1f).fillMaxHeight()
+                    .weight(0.01f).fillMaxHeight()
                     .background(Color(0xFFc9d8f7)), // Light blue background
                 contentAlignment = Alignment.Center
             ) {
@@ -238,6 +244,44 @@ fun LoginScreen(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text("Login", color = Color.White)
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                    try {
+
+                                            val firebaseUser = googleAuthProvider.signIn()
+                                            if (firebaseUser != null) {
+                                                Log.d(
+                                                    "Auth",
+                                                    "Compose: Signed in as: ${firebaseUser.displayName}, UID: ${firebaseUser.uid}"
+                                                )
+                                                // Show a Toast or navigate
+                                                // (Note: Toasts from composables need a Context, often passed down or accessed via LocalContext.current)
+                                                // Example using a simple Toast for demonstration, in a real app you'd navigate or show a SnackBar
+                                                // Toast.makeText(context, "Signed in!", Toast.LENGTH_SHORT).show()
+                                                //     loginViewModel.saveNewUser(firebaseUser)
+                                            } else {
+                                                Log.d(
+                                                    "Auth",
+                                                    "Compose: Google Sign-In failed or cancelled."
+                                                )
+                                                // Toast.makeText(context, "Sign-in failed!", Toast.LENGTH_SHORT).show()
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.e("Auth", "Compose: Error during sign-in", e)
+                                            // Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text("Login with Google", color = Color.White)
                             }
                         }
                     }

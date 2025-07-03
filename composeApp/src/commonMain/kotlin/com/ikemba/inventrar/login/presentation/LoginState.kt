@@ -9,6 +9,7 @@ data class LoginState (
     val isLoggedIn: Boolean = false,
     val currentUser: User? = null,
     var isVisible  : Boolean = false,
-    val errorMessage: String = ""
+    val errorMessage: String = "",
+    var showConfirmLogout: Boolean = false,
 
 )

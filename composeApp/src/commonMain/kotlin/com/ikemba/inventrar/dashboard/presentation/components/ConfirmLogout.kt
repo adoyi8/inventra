@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikemba.inventrar.core.presentation.components.CustomText
-import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
+import com.ikemba.inventrar.login.presentation.UserViewModel
 
 @Composable
-fun ConfirmLogout(viewModel: DashboardViewModel) {
+fun ConfirmLogout(viewModel: UserViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     AnimatedVisibility(visible = state.showConfirmLogout,
         enter = slideInHorizontally() + fadeIn(),

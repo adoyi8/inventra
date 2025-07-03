@@ -55,7 +55,7 @@ class SplashScreenViewModel(
                 else{
                   Util.accessToken = users.last().accessToken.toString()
                    // NavigationViewModel.navController?.navigate(Route.Login)
-                    NavigationViewModel.navController?.navigate(Route.POSScreen)
+                    NavigationViewModel.navController?.navigate(Route.UserProfileRoute)
                 }
             }
             .launchIn(viewModelScope)

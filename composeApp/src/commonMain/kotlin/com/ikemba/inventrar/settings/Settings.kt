@@ -1,8 +1,14 @@
-package com.ikemba.inventrar.login.presentation
+package com.ikemba.inventrar.settings
+
+import com.ikemba.inventrar.login.presentation.LoginAction
+import com.ikemba.inventrar.login.presentation.LoginState
+
+
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseUser
 import com.ikemba.inventrar.app.Route
 import com.ikemba.inventrar.core.domain.onError
 import com.ikemba.inventrar.core.domain.onSuccess
@@ -15,12 +21,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-class LoginViewModel(
+import com.ikemba.inventrar.auth.GoogleAuthUiProvider
+class SettingsViewModel(
     private val userRepository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
 ): ViewModel(){
     private val _state = MutableStateFlow(LoginState())
+    var googleAuthUIProvider : GoogleAuthUiProvider? = null
+
     val state = _state.asStateFlow()
     private fun login() {
         viewModelScope.launch {
@@ -28,10 +35,13 @@ class LoginViewModel(
                 .onSuccess { userResponse ->
 
                     if(userResponse?.responseCode == 0){
-                        Util.accessToken = userResponse.toUser().accessToken!!
+                        Util.accessToken = userResponse.employee?.token!!
                         userRepository.deleteAllUsers()
                         userRepository.saveUserInLocalDb(userResponse.toUser())
-                        NavigationViewModel.navController?.navigate(Route.POSScreen)
+                        _state.update {
+                            it.copy( isLoading = false, userName = "", password = "")
+                        }
+                        NavigationViewModel.navController?.navigate(Route.UserProfileRoute)
                     }
                     else{
                         _state.update {
@@ -49,7 +59,26 @@ class LoginViewModel(
                 }
         }
     }
-
+    fun logout() {
+        viewModelScope.launch {
+            hideShowConfirmLogout()
+            userRepository.deleteAllUsers()
+            googleAuthUIProvider?.signOut()
+            NavigationViewModel.navController?.navigate(Route.Login)
+        }
+    }
+    fun hideShowConfirmLogout() {
+        _state.update {
+            it.copy(showConfirmLogout = false)
+        }
+    }
+    fun showShowConfirmLogout() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(showConfirmLogout = true)
+            }
+        }
+    }
     fun onAction(action: LoginAction){
         when(action){
             is LoginAction.OnLoginButtonClicked ->{
@@ -74,7 +103,7 @@ class LoginViewModel(
                     it.copy(isLoading = true)
                 }
 
-               login()
+                login()
 
             }
             is LoginAction.OnPasswordChange ->{

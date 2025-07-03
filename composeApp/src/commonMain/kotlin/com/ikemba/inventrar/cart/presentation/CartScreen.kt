@@ -123,11 +123,11 @@ fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
                 }
         }
 }
-            VerticalScrollbar(
-                modifier = Modifier.align(Alignment.CenterEnd)
-                    .fillMaxHeight(),
-                adapter = rememberScrollbarAdapter(stateVertical)
-            )
+//            VerticalScrollbar(
+//                modifier = Modifier.align(Alignment.CenterEnd)
+//                    .fillMaxHeight(),
+//                adapter = rememberScrollbarAdapter(stateVertical)
+//            )
         }
         Column(modifier = Modifier.fillMaxWidth().weight(4.5f).clip(
             RoundedCornerShape(10.dp)).background(Color.LightGray)

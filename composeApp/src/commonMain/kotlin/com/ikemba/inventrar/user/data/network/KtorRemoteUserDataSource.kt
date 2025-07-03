@@ -45,12 +45,15 @@ class KtorRemoteUserDataSource(
     }
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun login(username: String, password: String): Result<UserLoginResponseDto, DataError.Remote> {
+
+        val loginBody =LoginRequest(emailAddress = username, password=Base64.encode(password.toByteArray()),ipAddress ="081343902049", deviceUsedToLogin = "ssds", countryOfLogin = "Nigeria", platformId = "1223")
+        println("Philo $loginBody")
         val response = safeCall<UserLoginResponseDto> {
             httpClient.post(
                 urlString = "${USER_SERVICE_URL}/employee-login"
             ){
                 contentType(ContentType.Application.Json)
-                setBody(LoginRequest(emailAddress = username, password=Base64.encode(password.toByteArray()),ipAddress ="081343902049", deviceUsedToLogin = "ssds", countryOfLogin = "Nigeria"))
+                setBody(loginBody)
             }
         }
         println("Ars "+ response.toString())

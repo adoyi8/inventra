@@ -8,30 +8,12 @@ import com.ikemba.inventrar.user.domain.User
 
 fun UserLoginResponseDto.toUser(): User {
     return User(
-        firstname= userResponseData?.account?.firstname,
-    middlename = userResponseData?.account?.middlename,
-    lastname = userResponseData?.account?.lastname,
-     email  = userResponseData?.account?.email,
-     username  = userResponseData?.account?.username,
-     roleId  = userResponseData?.account?.roleId,
-     roleName  = userResponseData?.account?.roleName,
-     staffNo  = userResponseData?.account?.staffNo,
-     officeId = userResponseData?.account?.officeId,
-    countryId = userResponseData?.account?.countryId,
-     stateId = userResponseData?.account?.stateId,
-     cityId = userResponseData?.account?.cityId,
-     merchantId = userResponseData?.account?.merchantId,
-     businessName = userResponseData?.account?.businessName,
-     businessEmail = userResponseData?.account?.businessEmail,
-     contactPhone = userResponseData?.account?.contactPhone,
-     currencyCode = userResponseData?.account?.currencyCode,
-     currencyEntity = userResponseData?.account?.currencyEntity,
-     userTimezone = userResponseData?.account?.userTimezone,
-     subscriptionId = userResponseData?.account?.subscriptionId,
-     businessLogo = userResponseData?.account?.businessLogo,
-     branchName = userResponseData?.account?.branchName,
-     defaultTax = userResponseData?.account?.defaultTax,
-     accessToken = userResponseData?.auth?.accessToken
+        firstname= employee?.firstName,
+    lastname = employee?.lastName,
+     email  = employee?.emailAddress,
+     roleId  = employee?.roleId,
+    countryId = employee?.countryId,
+     cityId = employee?.countryId
     )
 }
 

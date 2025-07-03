@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -35,6 +36,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation("com.google.android.gms:play-services-auth:21.2.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -61,6 +63,17 @@ kotlin {
             implementation(libs.bundles.coil)
             implementation("org.jsoup:jsoup:1.15.3")
             implementation("org.apache.commons:commons-text:1.10.0")
+
+
+            implementation("dev.gitlive:firebase-auth:1.10.3")
+            // Android Credential Manager
+            implementation("androidx.credentials:credentials:1.2.2") // Use the latest stable version
+
+            // Helper library for Google Sign-In with Credential Manager
+            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+            implementation("com.google.android.gms:play-services-auth:21.3.0")
+            implementation ("com.google.android.gms:play-services-base:18.4.0")
+            implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

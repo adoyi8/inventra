@@ -2,8 +2,8 @@ package com.ikemba.inventrar.heldOrder.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.HorizontalScrollbar
-import androidx.compose.foundation.VerticalScrollbar
+//import androidx.compose.foundation.HorizontalScrollbar
+//import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
+//import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -341,17 +341,17 @@ fun HeldOrderTransactionTable(viewModel: HeldOrderViewModel, dashboardViewModel:
     }
             ConfirmVoid(paginationRequest = paginationRequest.value )
     }
-        VerticalScrollbar(
-            modifier = Modifier.align(Alignment.CenterEnd)
-                .fillMaxHeight(),
-            adapter = rememberScrollbarAdapter(stateVertical)
-        )
-        HorizontalScrollbar(
-            modifier = Modifier.align(Alignment.BottomStart)
-                .fillMaxWidth()
-                .padding(end = 12.dp),
-            adapter = rememberScrollbarAdapter(stateHorizontal)
-        )
+//        VerticalScrollbar(
+//            modifier = Modifier.align(Alignment.CenterEnd)
+//                .fillMaxHeight(),
+//            adapter = rememberScrollbarAdapter(stateVertical)
+//        )
+//        HorizontalScrollbar(
+//            modifier = Modifier.align(Alignment.BottomStart)
+//                .fillMaxWidth()
+//                .padding(end = 12.dp),
+//            adapter = rememberScrollbarAdapter(stateHorizontal)
+//        )
 }
 
 }

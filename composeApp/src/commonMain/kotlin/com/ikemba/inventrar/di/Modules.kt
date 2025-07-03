@@ -2,6 +2,9 @@ package com.ikemba.inventrar.di
 
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.ikemba.inventrar.business.data.domain.BusinessRepository
+import com.ikemba.inventrar.business.network.KtorRemoteBusinessDataSource
+import com.ikemba.inventrar.business.network.RemoteBusinessDataSource
 import com.ikemba.inventrar.cart.data.network.KtorRemoteCartDataSource
 import com.ikemba.inventrar.cart.data.network.RemoteCartDataSource
 import com.ikemba.inventrar.cart.data.repository.DefaultCartRepository
@@ -19,7 +22,7 @@ import com.ikemba.inventrar.heldOrder.data.network.KtorRemoteHeldOrderDataSource
 import com.ikemba.inventrar.heldOrder.data.network.RemoteHeldOrderDataSource
 import com.ikemba.inventrar.heldOrder.data.repository.DefaultHeldOrderRepository
 import com.ikemba.inventrar.heldOrder.presentation.HeldOrderViewModel
-import com.ikemba.inventrar.login.presentation.LoginViewModel
+import com.ikemba.inventrar.login.presentation.UserViewModel
 import com.ikemba.inventrar.splashScreen.presentation.SplashScreenViewModel
 import com.ikemba.inventrar.transactionHistory.data.network.KtorRemoteTransactionHistoryDataSource
 import com.ikemba.inventrar.transactionHistory.data.network.RemoteTransactionHistoryDataSource
@@ -39,6 +42,8 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+import com.ikemba.inventrar.business.data.repository.DefaultBusinessRepository
+
 expect val platformModule: Module
 
 val sharedModule = module {
@@ -54,6 +59,8 @@ val sharedModule = module {
     singleOf(::KtorRemoteTransactionHistoryDataSource).bind<RemoteTransactionHistoryDataSource>()
     singleOf(::DefaultHeldOrderRepository).bind<HeldOrderRepository>()
     singleOf(::KtorRemoteHeldOrderDataSource).bind<RemoteHeldOrderDataSource>()
+    singleOf(::DefaultBusinessRepository).bind<BusinessRepository>()
+    singleOf(::KtorRemoteBusinessDataSource).bind<RemoteBusinessDataSource>()
 
     single {
         get<UserDatabaseFactory>().create()
@@ -74,7 +81,7 @@ val sharedModule = module {
     single { get<ProductDatabase>().cartDao }
     single { get<ProductDatabase>().postSalesRequestDao }
 
-    viewModelOf(::LoginViewModel)
+    viewModelOf(::UserViewModel)
     viewModelOf(::SplashScreenViewModel)
     viewModelOf(::DashboardViewModel)
     viewModelOf(::TransactionHistoryViewModel)

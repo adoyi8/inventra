@@ -4,7 +4,6 @@ package com.ikemba.inventrar.app
 import POScreen
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -20,22 +19,25 @@ import com.ikemba.inventrar.core.presentation.NavigationViewModel
 import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
 import com.ikemba.inventrar.login.presentation.LoginAction
 import com.ikemba.inventrar.login.presentation.LoginScreenRoot
-import com.ikemba.inventrar.login.presentation.LoginViewModel
+import com.ikemba.inventrar.login.presentation.UserViewModel
 import com.ikemba.inventrar.splashScreen.presentation.SplashScreenRoot
 import com.ikemba.inventrar.splashScreen.presentation.SplashScreenViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import com.ikemba.inventrar.auth.GoogleAuthUiProvider
+import com.ikemba.inventrar.dashboard.presentation.components.ConfirmLogout
+import com.ikemba.inventrar.theme.AppTheme
+import com.ikemba.inventrar.user.presentation.ShrineProfileApp
 
 @Composable
 @Preview
-fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null) {
-    MaterialTheme {
+fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel = koinViewModel<UserViewModel>(), googleAuthUiProvider: GoogleAuthUiProvider ) {
+    AppTheme {
         val navController = rememberNavController()
-
-
 
         LaunchedEffect(Unit) {
             NavigationViewModel.navController=navController
+            userViewModel.googleAuthUIProvider = googleAuthUiProvider
         }
 
         NavHost(
@@ -66,21 +68,27 @@ fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null) {
                     if(dashboardViewModel!=null && dashboardViewModel.value ==null) {
                         dashboardViewModel?.value = koinViewModel()
                     }
-                    POScreen(dashboardViewModel!!.value!!)
+                    POScreen(dashboardViewModel!!.value!!, userViewModel = userViewModel)
                 }
 
                 composable<Route.Login>(
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }
                 ) {
-                    val viewModel = koinViewModel<LoginViewModel>()
+
                     LaunchedEffect(true) {
                        val  action = LoginAction.OnToggleVisibility(true)
-                        viewModel.onAction(action)
+                        userViewModel.onAction(action)
                     }
                     LoginScreenRoot(
-                        viewModel = viewModel
+                        viewModel = userViewModel, googleAuthProvider = googleAuthUiProvider
                     )
+                }
+                composable<Route.UserProfileRoute>(
+                    exitTransition = { slideOutHorizontally() },
+                    popEnterTransition = { slideInHorizontally() }
+                ) {
+                    ShrineProfileApp(userViewModel = userViewModel)
                 }
 
 
@@ -89,6 +97,7 @@ fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null) {
         }
 
     }
+    ConfirmLogout(userViewModel)
 }
 
 @Composable

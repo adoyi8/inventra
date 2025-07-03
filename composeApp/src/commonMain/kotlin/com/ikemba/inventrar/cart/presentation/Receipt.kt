@@ -203,10 +203,10 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
             )
         }
     }
-        VerticalScrollbar(
-            modifier = Modifier.align(Alignment.CenterEnd)
-                .fillMaxHeight(),
-            adapter = rememberScrollbarAdapter(stateVertical)
-        )
+//        VerticalScrollbar(
+//            modifier = Modifier.align(Alignment.CenterEnd)
+//                .fillMaxHeight(),
+//            adapter = rememberScrollbarAdapter(stateVertical)
+//        )
     }
 }
