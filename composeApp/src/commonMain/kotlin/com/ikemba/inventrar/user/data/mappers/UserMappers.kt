@@ -7,17 +7,20 @@ import com.ikemba.inventrar.user.domain.User
 
 
 fun UserLoginResponseDto.toUser(): User {
+    println("sarank 1 "+ employee?.employeeId)
     return User(
         firstname= employee?.firstName,
     lastname = employee?.lastName,
      email  = employee?.emailAddress,
      roleId  = employee?.roleId,
     countryId = employee?.countryId,
-     cityId = employee?.countryId
+     cityId = employee?.countryId,
+        userId = employee?.employeeId
     )
 }
 
 fun User.toUserEntity(): UserEntity {
+    println("sarank 2 "+ userId)
     return UserEntity(
         id = id,
         firstname= firstname,
@@ -43,11 +46,15 @@ fun User.toUserEntity(): UserEntity {
         businessLogo = businessLogo,
         branchName = branchName,
         defaultTax = defaultTax,
-        accessToken = accessToken
+        accessToken = accessToken,
+        userId = userId,
+        organizationId = organizationId,
+        organizationName = organizationName
     )
 }
 
 fun UserEntity.toUser(): User {
+    println("sarank 3"+ userId)
     return User(
         id = id,
         firstname= firstname,
@@ -73,6 +80,9 @@ fun UserEntity.toUser(): User {
         businessLogo = businessLogo,
         branchName = branchName,
         defaultTax = defaultTax,
-        accessToken = accessToken
+        accessToken = accessToken,
+        userId = userId,
+        organizationId = organizationId,
+        organizationName = organizationName
     )
 }

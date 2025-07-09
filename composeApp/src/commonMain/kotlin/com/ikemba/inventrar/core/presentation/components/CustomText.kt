@@ -17,15 +17,6 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun CustomText(text: String, size: TextUnit = 16.sp, color: Color = MaterialTheme.colorScheme.onBackground, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start, fontWeight: FontWeight = FontWeight.Normal, textDecoration: TextDecoration = TextDecoration.None){
 
-
-//    val fontFamily = FontFamily(
-//        Font(
-//            resource = "fonts/montserrat.ttf",
-//            weight = FontWeight.W400,
-//            style = FontStyle.Normal
-//        )
-//    )
-
     Text(modifier = modifier, text = text, textAlign = textAlign, style = TextStyle(fontSize = size,color = color, fontWeight = fontWeight, textDecoration = textDecoration,
        // fontFamily = fontFamily
     ))

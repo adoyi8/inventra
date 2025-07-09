@@ -19,7 +19,7 @@ class DefaultBusinessRepository(
         accessToken: String,
         request: VoidOrderRequest
     ): Result<SingleHeldOrderDto, DataError.Remote> {
-        return remoteBusinessDataSource.getSingleHeldOrders(accessToken,request)
+        TODO("Not yet implemented")
     }
 
 
@@ -28,11 +28,16 @@ class DefaultBusinessRepository(
     }
 
     override suspend fun createBusiness(accessToken: String, createBusinessRequest: CreateBusinessRequest): Result<ResponseDto, DataError.Remote> {
+       return remoteBusinessDataSource.createBusiness(accessToken, createBusinessRequest)
+    }
+
+    override suspend fun voidOrder(
+        accessToken: String,
+        voidOrderRequest: VoidOrderRequest
+    ): Result<ResponseDto, DataError.Remote> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun voidOrder(accessToken: String, voidOrderRequest: VoidOrderRequest): Result<ResponseDto, DataError.Remote> {
-        return remoteBusinessDataSource.voidOrder(accessToken,voidOrderRequest)
-    }
+
 }
 

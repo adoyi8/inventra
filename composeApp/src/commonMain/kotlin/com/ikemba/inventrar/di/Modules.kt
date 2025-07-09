@@ -2,6 +2,7 @@ package com.ikemba.inventrar.di
 
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.ikemba.inventrar.admin.presentation.AdminViewModel
 import com.ikemba.inventrar.business.data.domain.BusinessRepository
 import com.ikemba.inventrar.business.network.KtorRemoteBusinessDataSource
 import com.ikemba.inventrar.business.network.RemoteBusinessDataSource
@@ -43,6 +44,14 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 import com.ikemba.inventrar.business.data.repository.DefaultBusinessRepository
+import com.ikemba.inventrar.business.presentation.BusinessViewModel
+import com.ikemba.inventrar.dropdowndata.data.domain.DropDownSettingsRepository
+import com.ikemba.inventrar.dropdowndata.data.repository.DefaultDropDownSettingsRepository
+import com.ikemba.inventrar.dropdowndata.network.KtorRemoteDropDownSettingsDataSource
+import com.ikemba.inventrar.dropdowndata.network.RemoteDropDownSettingsDataSource
+import com.ikemba.inventrar.dropdowndata.presentation.DropDownSettingsViewModel
+import com.ikemba.inventrar.inventory.data.domain.InventoryRepository
+import com.ikemba.inventrar.inventory.network.KtorRemoteInventoryDataSource
 
 expect val platformModule: Module
 
@@ -61,6 +70,10 @@ val sharedModule = module {
     singleOf(::KtorRemoteHeldOrderDataSource).bind<RemoteHeldOrderDataSource>()
     singleOf(::DefaultBusinessRepository).bind<BusinessRepository>()
     singleOf(::KtorRemoteBusinessDataSource).bind<RemoteBusinessDataSource>()
+    singleOf(::KtorRemoteInventoryDataSource).bind<InventoryRepository>()
+
+    singleOf(::DefaultDropDownSettingsRepository).bind<DropDownSettingsRepository>()
+    singleOf(::KtorRemoteDropDownSettingsDataSource).bind<RemoteDropDownSettingsDataSource>()
 
     single {
         get<UserDatabaseFactory>().create()
@@ -87,4 +100,7 @@ val sharedModule = module {
     viewModelOf(::TransactionHistoryViewModel)
     viewModelOf(::HeldOrderViewModel)
     viewModelOf(::ChangePasswordViewModel)
+    viewModelOf(::BusinessViewModel)
+    viewModelOf(::DropDownSettingsViewModel)
+    viewModelOf(::AdminViewModel)
 }

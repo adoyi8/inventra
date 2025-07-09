@@ -15,6 +15,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.ikemba.inventrar.admin.TwoStepMenuScreen
+import com.ikemba.inventrar.admin.presentation.AdminViewModel
+import com.ikemba.inventrar.admin.presentation.CreateInventoryForm
 import com.ikemba.inventrar.core.presentation.NavigationViewModel
 import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
 import com.ikemba.inventrar.login.presentation.LoginAction
@@ -25,13 +28,15 @@ import com.ikemba.inventrar.splashScreen.presentation.SplashScreenViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import com.ikemba.inventrar.auth.GoogleAuthUiProvider
+import com.ikemba.inventrar.business.presentation.BusinessViewModel
 import com.ikemba.inventrar.dashboard.presentation.components.ConfirmLogout
+import com.ikemba.inventrar.dropdowndata.presentation.DropDownSettingsViewModel
 import com.ikemba.inventrar.theme.AppTheme
 import com.ikemba.inventrar.user.presentation.ShrineProfileApp
 
 @Composable
 @Preview
-fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel = koinViewModel<UserViewModel>(), googleAuthUiProvider: GoogleAuthUiProvider ) {
+fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel = koinViewModel<UserViewModel>(), businessViewModel: BusinessViewModel = koinViewModel(), dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(),adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider,  ) {
     AppTheme {
         val navController = rememberNavController()
 
@@ -88,8 +93,23 @@ fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewM
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }
                 ) {
-                    ShrineProfileApp(userViewModel = userViewModel)
+                    ShrineProfileApp(userViewModel = userViewModel, businessViewModel = businessViewModel, dropDownSettingsViewModel = dropDownSettingsViewModel)
                 }
+                composable<Route.AdminMenuRoute>(
+                    exitTransition = { slideOutHorizontally() },
+                    popEnterTransition = { slideInHorizontally() }
+                ) {
+                   // ShrineProfileApp(userViewModel = userViewModel, businessViewModel = businessViewModel, dropDownSettingsViewModel = dropDownSettingsViewModel)
+                    TwoStepMenuScreen()
+                }
+                composable<Route.AddItemToInventoryRoute>(
+                    exitTransition = { slideOutHorizontally() },
+                    popEnterTransition = { slideInHorizontally() }
+                ) {
+                    // ShrineProfileApp(userViewModel = userViewModel, businessViewModel = businessViewModel, dropDownSettingsViewModel = dropDownSettingsViewModel)
+                    CreateInventoryForm(adminViewModel = adminViewModel, userViewModel = userViewModel)
+                }
+
 
 
             }

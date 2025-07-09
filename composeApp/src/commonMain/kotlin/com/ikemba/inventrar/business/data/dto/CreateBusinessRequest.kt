@@ -30,6 +30,7 @@ data class CreateBusinessRequest(
      */
     val description: String? = null,
 
+
     /**
      * The state  id or province where the organization is located.
      */

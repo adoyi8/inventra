@@ -31,5 +31,8 @@ data class UserEntity(
     var businessLogo: String? = null,
     var branchName: String? = null,
     var defaultTax: String? = null,
-    var accessToken: String? = null
+    var accessToken: String? = null,
+    val userId: String? = null,
+    var organizationId: String? = null,
+    var organizationName: String? = null,
 )

@@ -93,7 +93,10 @@ fun RoomListContainer(userViewModel: UserViewModel) {
                                 initialOffsetX = { it / 2 }),
                             exit = fadeOut(animationSpec = tween(300))
                         ) {
-                            RoomItem(room)
+                            val onClick ={
+                                userViewModel.setSelectedBusiness(room)
+                            }
+                            RoomItem(room, onClick)
                         }
                     }
                 }
@@ -124,11 +127,9 @@ fun AnimatedButton(
             .size(width = 100.dp, height = 50.dp)
             .clickable(
                 interactionSource = interactionSource,
-                indication = null
-               // onClick = onClick
-            ){
-               onClick
-            }
+                indication = null,
+                onClick = onClick
+            )
             .border(width = 2.dp, color = Color(0xFFfebaba))
             .background(
                 brush = Brush.verticalGradient(
@@ -143,7 +144,7 @@ fun AnimatedButton(
 }
 
 @Composable
-fun RoomItem(room: SearchOrganizationResult) {
+fun RoomItem(room: SearchOrganizationResult, onClick: () -> Unit) {
 
 
         Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Color.Red)) {
@@ -155,7 +156,7 @@ fun RoomItem(room: SearchOrganizationResult) {
             ) {
                     Text(room.organizationName, fontWeight = FontWeight.Bold)
                 AnimatedButton(
-                    onClick = { /* Handle Join Room */ },
+                    onClick = onClick,
                     shape = RoundedCornerShape(8.dp),
                     content = "JOIN"
                     //  colors = ButtonDefaults.buttonColors(containerColor = Brush.),

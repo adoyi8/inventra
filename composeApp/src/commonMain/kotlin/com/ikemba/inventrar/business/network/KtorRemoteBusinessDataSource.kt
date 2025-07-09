@@ -1,17 +1,19 @@
 package com.ikemba.inventrar.business.network
 
 
+import com.ikemba.inventrar.business.data.dto.CreateBusinessRequest
 import com.ikemba.inventrar.business.data.dto.OrganizationResponse
 import com.ikemba.inventrar.business.data.dto.SearchOrganizationRequest
 import com.ikemba.inventrar.core.data.dto.ResponseDto
 import com.ikemba.inventrar.core.data.safeCall
 import com.ikemba.inventrar.core.domain.DataError
 import com.ikemba.inventrar.core.domain.Result
+import com.ikemba.inventrar.dashboard.utils.Util.APP_NAME
+import com.ikemba.inventrar.dashboard.utils.Util.AUTHORIZATION_TOKEN
 import com.ikemba.inventrar.dashboard.utils.Util.BASE_URL
-import com.ikemba.inventrar.heldOrder.data.dto.HeldOrderDto
+import com.ikemba.inventrar.dashboard.utils.Util.ORGANIZATION_SERVICE_URL
 import com.ikemba.inventrar.heldOrder.data.dto.SingleHeldOrderDto
 import com.ikemba.inventrar.heldOrder.data.dto.VoidOrderRequest
-import com.ikemba.inventrar.transactionHistory.data.dto.PaginationRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -33,11 +35,13 @@ class KtorRemoteBusinessDataSource(
     ): Result<OrganizationResponse, DataError.Remote> {
         return safeCall<OrganizationResponse> {
             httpClient.post(
-                urlString = "${BASE_URL}/held_order_list/"
+                urlString = "${ORGANIZATION_SERVICE_URL}/search-organization"
             ){
                 contentType(ContentType.Application.Json)
                 headers {
                     append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    append("Authentication", AUTHORIZATION_TOKEN)
+                    append("appname", APP_NAME)
                 }
                 setBody(paginationRequest)
 
@@ -45,37 +49,39 @@ class KtorRemoteBusinessDataSource(
         }
     }
 
-    override suspend fun getSingleHeldOrders(accessToken: String, voidOrderRequest: VoidOrderRequest): Result<SingleHeldOrderDto, DataError.Remote> {
-        return safeCall<SingleHeldOrderDto> {
-            httpClient.post(
-                urlString = "${BASE_URL}/get_single_held_order/"
-            ){
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer $accessToken")
-                }
-                setBody(voidOrderRequest)
-
-            }
-        }
-    }
-
-    override suspend fun holdOrder(voidOrderRequest: VoidOrderRequest): Result<ResponseDto, DataError.Remote> {
+    override suspend fun updateBusiness(
+        accessToken: String,
+        request: CreateBusinessRequest
+    ): Result<ResponseDto, DataError.Remote> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun voidOrder(accessToken: String,voidOrderRequest: VoidOrderRequest): Result<ResponseDto, DataError.Remote> {
+    override suspend fun createBusiness(
+        accessToken: String,
+        request: CreateBusinessRequest
+    ): Result<ResponseDto, DataError.Remote> {
         return safeCall<ResponseDto> {
             httpClient.post(
-                urlString = "${BASE_URL}/void/"
+                urlString = "${ORGANIZATION_SERVICE_URL}/create-organization"
             ){
                 contentType(ContentType.Application.Json)
                 headers {
                     append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    append("Authentication", AUTHORIZATION_TOKEN)
+                    append("appname", APP_NAME)
                 }
-                setBody(voidOrderRequest)
+                setBody(request)
 
             }
         }
     }
+
+    override suspend fun deleteBusiness(
+        accessToken: String,
+        request: String
+    ): Result<ResponseDto, DataError.Remote> {
+        TODO("Not yet implemented")
+    }
+
+
 }

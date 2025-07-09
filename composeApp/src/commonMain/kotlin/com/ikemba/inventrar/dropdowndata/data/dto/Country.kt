@@ -1,16 +1,19 @@
 package com.ikemba.inventrar.dropdowndata.data.dto
 
+import kotlinx.serialization.Serializable
 import org.jsoup.select.Evaluator.Id
 import java.time.LocalDateTime
 
 
 
+
+@Serializable
 data class Country (
     /**
      * Unique identifier for the country.
      */
 
-    private val countryId: String? = null,
+     val countryId: String? = null,
 
     /**
      * Name of the country.
@@ -47,18 +50,4 @@ data class Country (
      */
     val voidedBy: String? = null,
 
-    /**
-     * Date and time when the country was created.
-     */
-    val dateCreated: LocalDateTime? = null,
-
-    /**
-     * Date and time when the country was last updated.
-     */
-    val dateUpdated: LocalDateTime? = null,
-
-    /**
-     * Date and time when the country was voided.
-     */
-    val dateVoided: LocalDateTime? = null
 )

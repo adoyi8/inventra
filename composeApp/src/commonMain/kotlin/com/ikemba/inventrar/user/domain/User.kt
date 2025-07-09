@@ -4,6 +4,7 @@ import java.util.UUID
 
 data class User(
     val id: String = UUID.randomUUID().toString(),
+    val userId: String? = null,
     var firstname: String? = null,
     var middlename: String? = null,
     var lastname: String? = null,
@@ -27,7 +28,9 @@ data class User(
     var businessLogo: String? = null,
     var branchName: String? = null,
     var defaultTax: String? = null,
-    var accessToken: String? = null
+    var accessToken: String? = null,
+    var organizationId: String? = null,
+    var organizationName: String? = null,
 ){
     fun getFullName(): String{
         return "$firstname $lastname"

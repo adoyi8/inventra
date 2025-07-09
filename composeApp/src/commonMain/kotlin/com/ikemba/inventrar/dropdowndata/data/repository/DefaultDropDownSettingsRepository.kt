@@ -22,7 +22,7 @@ import com.ikemba.inventrar.dropdowndata.network.RemoteDropDownSettingsDataSourc
 import com.ikemba.inventrar.heldOrder.data.dto.SingleHeldOrderDto
 import com.ikemba.inventrar.heldOrder.data.dto.VoidOrderRequest
 
-class DefaultBusinessRepository(
+class DefaultDropDownSettingsRepository(
     private val remoteBusinessDataSource: RemoteDropDownSettingsDataSource,
 ): DropDownSettingsRepository {
     override suspend fun getCountry(request: Country): Result<CountryResponse, DataError.Remote> {

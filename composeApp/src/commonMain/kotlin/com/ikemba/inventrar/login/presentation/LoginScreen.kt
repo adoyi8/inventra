@@ -74,10 +74,6 @@ fun LoginScreenRoot(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LaunchedEffect(true){
-          delay(5000)
-
-        }
         LoginScreen(
             state = state,
             onAction = { action ->

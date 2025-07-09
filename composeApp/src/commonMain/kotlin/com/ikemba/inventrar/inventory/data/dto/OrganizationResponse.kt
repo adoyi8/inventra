@@ -1,4 +1,4 @@
-package com.ikemba.inventrar.business.data.dto
+package com.ikemba.inventrar.inventory.data.dto
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName

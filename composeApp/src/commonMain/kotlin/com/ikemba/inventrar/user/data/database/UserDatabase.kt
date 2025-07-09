@@ -8,7 +8,7 @@ import com.ikemba.inventrar.dashboard.data.database.StringListTypeConverter
 
 @Database(
     entities = [UserEntity::class],
-    version = 1
+    version = 3
 )
 @TypeConverters(
     StringListTypeConverter::class

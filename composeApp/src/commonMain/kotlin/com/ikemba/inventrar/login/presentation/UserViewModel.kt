@@ -19,6 +19,15 @@ import com.ikemba.inventrar.auth.GoogleAuthUiProvider
 import com.ikemba.inventrar.business.data.domain.BusinessRepository
 import com.ikemba.inventrar.business.data.dto.CreateBusinessRequest
 import com.ikemba.inventrar.business.data.dto.SearchOrganizationRequest
+import com.ikemba.inventrar.business.data.dto.SearchOrganizationResult
+import com.ikemba.inventrar.user.data.mappers.toUserEntity
+import com.ikemba.inventrar.user.domain.User
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 
 
 class UserViewModel(
@@ -30,8 +39,18 @@ class UserViewModel(
 
     private val _userState = MutableStateFlow(UserState())
      var googleAuthUIProvider : GoogleAuthUiProvider? = null
+    private var observeUsers: Job? = null
 
     val state = _state.asStateFlow()
+        .onStart {
+            observeUsers()
+
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            _state.value
+        )
     val userState = _userState.asStateFlow()
     private fun login() {
         viewModelScope.launch {
@@ -121,6 +140,26 @@ class UserViewModel(
                 }
         }
     }
+
+    private fun observeUsers() {
+        observeUsers?.cancel()
+        observeUsers = userRepository
+            .getAllUsers()
+            .onEach { users ->
+                if (users.isNotEmpty()) {
+                    _state.update { it ->
+                        it.copy(
+                            currentUser = users.first()
+                        )
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+    fun getUser(): User? {
+        println("ohimi "+ _state.value.currentUser!!.organizationId)
+        return (_state.value.currentUser)
+    }
     fun logout() {
         viewModelScope.launch {
             hideShowConfirmLogout()
@@ -197,5 +236,15 @@ class UserViewModel(
                 it.copy(errorMessage = "")
             }
         }
+    }
+
+    fun setSelectedBusiness(result: SearchOrganizationResult) {
+        viewModelScope.launch {
+            val user = getUser()!!
+            user.organizationId = result.organizationId
+            user.organizationName = result.organizationName
+            userRepository.saveUserInLocalDb(user)
+        }
+
     }
 }

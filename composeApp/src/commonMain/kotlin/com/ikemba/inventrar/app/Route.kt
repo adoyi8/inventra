@@ -23,5 +23,14 @@ sealed interface Route {
     data object UserProfileRoute: Route
 
     @Serializable
+    data object AdminMenuRoute: Route
+
+    @Serializable
+    data object AddItemToInventoryRoute: Route
+
+
+
+    @Serializable
     data class BookDetail(val id: String): Route
+
 }

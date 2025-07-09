@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ResponseDto(
-    @SerialName("response_code") var responseCode: Int,
-    @SerialName("response_message") val responseMessage: String?,
+    @SerialName("responseCode") var responseCode: Int,
+    @SerialName("responseMessage") val responseMessage: String?,
     )

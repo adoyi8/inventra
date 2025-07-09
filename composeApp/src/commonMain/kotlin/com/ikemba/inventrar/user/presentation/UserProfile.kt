@@ -28,11 +28,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ikemba.inventrar.admin.TwoStepMenuScreen
 import com.ikemba.inventrar.business.AnimatedButton
 import com.ikemba.inventrar.business.RoomListContainer
+import com.ikemba.inventrar.business.presentation.BusinessViewModel
+import com.ikemba.inventrar.core.presentation.components.CustomText
+import com.ikemba.inventrar.core.presentation.components.ProgressDialog
+import com.ikemba.inventrar.dropdowndata.data.dto.City
+import com.ikemba.inventrar.dropdowndata.data.dto.Country
+import com.ikemba.inventrar.dropdowndata.data.dto.OrganizationType
+import com.ikemba.inventrar.dropdowndata.data.dto.State
+import com.ikemba.inventrar.dropdowndata.presentation.DropDownSettingsViewModel
 
 import com.ikemba.inventrar.login.presentation.UserViewModel
 import com.ikemba.inventrar.theme.AppTheme
+import com.ikemba.inventrar.user.domain.User
 
 import inventrar.composeapp.generated.resources.Res
 import inventrar.composeapp.generated.resources.add
@@ -41,7 +52,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShrineProfileApp(userViewModel: UserViewModel) {
+fun ShrineProfileApp(userViewModel: UserViewModel, businessViewModel: BusinessViewModel, dropDownSettingsViewModel: DropDownSettingsViewModel) {
     // M3: Use DrawerState for the navigation drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -136,6 +147,12 @@ fun ShrineProfileApp(userViewModel: UserViewModel) {
                             selected = currentScreen == "Businesses",
                             onClick = { currentScreen = "Businesses" }
                         )
+                        NavigationBarItem(
+                            icon = { Icon(painterResource(Res.drawable.add), contentDescription = "Businesses", modifier=Modifier.size(24.dp)) },
+                            label = { Text("Admin") },
+                            selected = currentScreen == "Admin",
+                            onClick = { currentScreen = "Admin" }
+                        )
                     }
                 },
                 floatingActionButton = {
@@ -161,7 +178,8 @@ fun ShrineProfileApp(userViewModel: UserViewModel) {
                     when (screen) {
                         "Profile" -> ProfileScreen()
                         "Businesses" ->  RoomListContainer(userViewModel)
-                        "CreateBusiness" ->  BusinessCreationForm()
+                        "CreateBusiness" ->  BusinessCreationForm(businessViewModel, dropDownSettingsViewModel, userViewModel)
+                        "Admin" -> TwoStepMenuScreen()
                     }
                 }
             }
@@ -211,35 +229,71 @@ fun ProfileScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BusinessCreationForm() {
+fun BusinessCreationForm(businessViewModel: BusinessViewModel, dropDownSettingsViewModel: DropDownSettingsViewModel, userViewModel: UserViewModel) {
+
+   // val businessState = businessViewModel.state.collectAsStateWithLifecycle()
+    val createBusinessFormState = businessViewModel.createBusinessFormState.collectAsStateWithLifecycle()
+    val dropDownState = dropDownSettingsViewModel.state.collectAsStateWithLifecycle()
+    val businessState = businessViewModel.state.collectAsStateWithLifecycle()
     var businessName by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
 
-    // Sample data for dropdowns
-    val businessTypes = listOf("Retail", "Technology", "Hospitality", "Healthcare")
-    val countries = listOf("Nigeria", "USA", "Canada", "UK")
-    val states = mapOf("Nigeria" to listOf("Lagos", "Abuja", "Kano"), "USA" to listOf("California", "New York", "Texas"))
-    val cities = mapOf("Lagos" to listOf("Ikeja", "Victoria Island"), "Abuja" to listOf("Garki", "Wuse"))
 
-    var selectedCountry by remember { mutableStateOf(countries[0]) }
-    var selectedState by remember { mutableStateOf(states[selectedCountry]?.get(0) ?: "") }
-    var selectedCity by remember { mutableStateOf(cities[selectedState]?.get(0) ?: "") }
+    LaunchedEffect(true){
+        dropDownSettingsViewModel.getCountries(Country())
+        dropDownSettingsViewModel.getOrganizationType(OrganizationType())
+    }
+
 
     // Update states when country changes
-    LaunchedEffect(selectedCountry) {
-        selectedState = states[selectedCountry]?.get(0) ?: ""
+    LaunchedEffect(createBusinessFormState.value.selectedCountry) {
+
+        if(createBusinessFormState.value.selectedCountry!=null){
+            dropDownSettingsViewModel.getState(State(
+                countryId = createBusinessFormState.value.selectedCountry!!.countryId,
+                stateId = null,
+                stateName = null,
+                voided = null,
+                createdBy = null,
+                updatedBy = null,
+                voidedBy = null,
+                dateCreated = null,
+                dateUpdated = null,
+                dateVoided = null
+            ))
+        }
+
+      //  selectedState = states[selectedCountry]?.get(0) ?: ""
     }
     // Update cities when state changes
-    LaunchedEffect(selectedState) {
-        selectedCity = cities[selectedState]?.get(0) ?: ""
+    LaunchedEffect(createBusinessFormState.value.selectedState) {
+        if(createBusinessFormState.value.selectedState!=null){
+            dropDownSettingsViewModel.getCity(City(
+                stateId = createBusinessFormState.value.selectedState!!.stateId,
+                cityId = null,
+                cityName = null,
+                countryId = null,
+                stateName = null,
+                voided = null,
+                createdBy = null,
+                updatedBy = null,
+                voidedBy = null,
+                dateCreated = null,
+                dateUpdated = null,
+                dateVoided = null
+            ))
+        }
+
     }
+
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
-            .verticalScroll(rememberScrollState()), // Make form scrollable
+            , // Make form scrollable
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AnimatedVisibility(
@@ -247,47 +301,94 @@ fun BusinessCreationForm() {
             enter = slideInVertically(initialOffsetY = { -40 }) + fadeIn(),
             exit = slideOutVertically() + fadeOut()
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
                 OutlinedTextField(
-                    value = businessName,
-                    onValueChange = { businessName = it },
+                    value = createBusinessFormState.value.businessName,
+                    onValueChange = { businessViewModel.updateBusinessName(it) },
                     label = { Text("Business Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(16.dp))
 
+                AnimatedVisibility(visible =  dropDownState.value.organizationTypes.isNotEmpty(), enter = scaleIn(), exit = scaleOut()) {
+
+                        OrganizationTypeDropdownField(
+                            label = "Business Type",
+                            options = dropDownState.value.organizationTypes,
+                            selectedOption = dropDownState.value.organizationTypes.first(),
+                            onOptionSelected = { businessViewModel.updateSelectedBusinessType(it) }
+                        )
+
+                }
                 // Business Type Dropdown
-                DropdownField(
-                    label = "Business Type",
-                    options = businessTypes,
-                    selectedOption = businessTypes[0],
-                    onOptionSelected = { /* Update state */ }
-                )
+
                 Spacer(Modifier.height(16.dp))
 
-                // Country Dropdown
-                DropdownField("Country", countries, selectedCountry) { selectedCountry = it }
-                Spacer(Modifier.height(16.dp))
+                if(dropDownState.value.countries.isNotEmpty()) {
+                    // Country Dropdown
+                    DropdownField(
+                        "Country",
+                        dropDownState.value.countries,
+                        dropDownState.value.countries.first()
+                    ) { businessViewModel.updateSelectedCountry(it)}
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                if(dropDownState.value.states.isNotEmpty()) {
+                    // Country Dropdown
+                    StateDropdownField(
+                        "State",
+                        dropDownState.value.states,
+                        dropDownState.value.states.first()
+                    ) { businessViewModel.updateSelectedState(it)}
+                    Spacer(Modifier.height(16.dp))
+                }
+                if(dropDownState.value.cities.isNotEmpty()) {
+                    // Country Dropdown
+                    CityDropdownField(
+                        "City",
+                        dropDownState.value.cities,
+                        dropDownState.value.cities.first()
+                    ) { businessViewModel.updateSelectedCity(it)}
+                    Spacer(Modifier.height(16.dp))
+                }
 
                 // State Dropdown
-                DropdownField("State", states[selectedCountry] ?: emptyList(), selectedState) { selectedState = it }
-                Spacer(Modifier.height(16.dp))
+              //  DropdownField("State", states[selectedCountry] ?: emptyList(), selectedState) { selectedState = it }
+               // Spacer(Modifier.height(16.dp))
 
                 // City Dropdown
-                DropdownField("City", cities[selectedState] ?: emptyList(), selectedCity) { selectedCity = it }
+                //DropdownField("City", cities[selectedState] ?: emptyList(), selectedCity) { selectedCity = it }
                 Spacer(Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = address,
-                    onValueChange = { address = it },
+                    value = createBusinessFormState.value.address,
+                    onValueChange = { businessViewModel.updateBusinessAddress(it) },
                     label = { Text("Address") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3
                 )
-                Spacer(Modifier.height(24.dp))
+                OutlinedTextField(
+                    value = createBusinessFormState.value.description,
+                    onValueChange = { businessViewModel.updateBusinessDescription(it) },
+                    label = { Text("Address") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3
+                )
 
+                CustomText(businessState.value.errorMessage, color = Color.Red)
+                Spacer(Modifier.height(24.dp))
                 Button(
-                    onClick = { /* Handle form submission */ },
+                    onClick = {
+                        println("userId "+ userViewModel.getUser()?.userId)
+                        userViewModel.getUser()?.let{
+
+                            it.userId?.let { userId ->
+                                businessViewModel.validateThenCreateBusiness(userId)
+                            }
+                        }
+
+                              },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
                 ) {
@@ -296,15 +397,18 @@ fun BusinessCreationForm() {
             }
         }
     }
+    AnimatedVisibility(visible = businessState.value.isLoading || dropDownState.value.isLoading, enter = scaleIn(), exit = scaleOut()){
+        ProgressDialog("Processing...")
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownField(
     label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit
+    options: List<Country>,
+    selectedOption: Country,
+    onOptionSelected: (Country) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     var currentSelection by remember { mutableStateOf(selectedOption) }
@@ -319,7 +423,7 @@ fun DropdownField(
         onExpandedChange = { expanded = !expanded }
     ) {
         OutlinedTextField(
-            value = currentSelection,
+            value = currentSelection.countryName!!,
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
@@ -332,7 +436,143 @@ fun DropdownField(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(option.countryName!!) },
+                    onClick = {
+                        currentSelection = option
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StateDropdownField(
+    label: String,
+    options: List<State>,
+    selectedOption: State,
+    onOptionSelected: (State) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var currentSelection by remember { mutableStateOf(selectedOption) }
+
+    // Update internal state if the external selectedOption changes
+    LaunchedEffect(selectedOption) {
+        currentSelection = selectedOption
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = currentSelection.stateName!!,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.stateName!!) },
+                    onClick = {
+                        currentSelection = option
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CityDropdownField(
+    label: String,
+    options: List<City>,
+    selectedOption: City,
+    onOptionSelected: (City) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var currentSelection by remember { mutableStateOf(selectedOption) }
+
+    // Update internal state if the external selectedOption changes
+    LaunchedEffect(selectedOption) {
+        currentSelection = selectedOption
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = currentSelection.cityName!!,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.cityName!!) },
+                    onClick = {
+                        currentSelection = option
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OrganizationTypeDropdownField(
+    label: String,
+    options: List<OrganizationType>,
+    selectedOption: OrganizationType,
+    onOptionSelected: (OrganizationType) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var currentSelection by remember { mutableStateOf(selectedOption) }
+
+    // Update internal state if the external selectedOption changes
+    LaunchedEffect(selectedOption) {
+        currentSelection = selectedOption
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = currentSelection.organizationType!!,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.organizationType!!) },
                     onClick = {
                         currentSelection = option
                         onOptionSelected(option)

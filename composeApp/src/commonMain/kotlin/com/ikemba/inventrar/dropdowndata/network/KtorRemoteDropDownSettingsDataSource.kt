@@ -37,7 +37,7 @@ class KtorRemoteDropDownSettingsDataSource(
     ): Result<CountryResponse, DataError.Remote> {
         return safeCall<CountryResponse> {
             httpClient.post(
-                urlString = "${SETTINGS_SERVICE_URL}/held_order_list/"
+                urlString = "${SETTINGS_SERVICE_URL}/get-country"
             ){
                 contentType(ContentType.Application.Json)
                 setBody(request)
@@ -51,7 +51,7 @@ class KtorRemoteDropDownSettingsDataSource(
     ): Result<StateResponse, DataError.Remote> {
         return safeCall<StateResponse> {
             httpClient.post(
-                urlString = "${SETTINGS_SERVICE_URL}/held_order_list/"
+                urlString = "${SETTINGS_SERVICE_URL}/get-state"
             ){
                 contentType(ContentType.Application.Json)
 
@@ -67,7 +67,7 @@ class KtorRemoteDropDownSettingsDataSource(
     ): Result<CityResponse, DataError.Remote> {
         return safeCall<CityResponse> {
             httpClient.post(
-                urlString = "${SETTINGS_SERVICE_URL}/held_order_list/"
+                urlString = "${SETTINGS_SERVICE_URL}/get-city"
             ){
                 contentType(ContentType.Application.Json)
 
@@ -83,7 +83,7 @@ class KtorRemoteDropDownSettingsDataSource(
     ): Result<OrganizationTypeResponse, DataError.Remote> {
         return safeCall<OrganizationTypeResponse> {
             httpClient.post(
-                urlString = "${SETTINGS_SERVICE_URL}/held_order_list/"
+                urlString = "${SETTINGS_SERVICE_URL}/get-organization-type"
             ){
                 contentType(ContentType.Application.Json)
                 setBody(request)
