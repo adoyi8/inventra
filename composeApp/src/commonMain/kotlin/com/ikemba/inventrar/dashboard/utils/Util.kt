@@ -25,7 +25,7 @@ object Util {
     val INVENTORY_SERVICE_URL = "$NGROK_URL/api/v1/inventory_service/public"
     val ORGANIZATION_SERVICE_URL = "$NGROK_URL/api/v1/organization_service/public"
     val AUTHORIZATION_TOKEN = "OGFiMjU2ZTJlOGI1NDMyNjg0NWRmMjJhOGIwOTE1OGE="
-    val APP_NAME = "visitavia-mobile"
+    val APP_NAME: String = "Ogle"
     //val BASE_URL = "http://api.ikembatech.com.au/v1"
     var accessToken: String = ""
     fun generateTransactionReference(): String {

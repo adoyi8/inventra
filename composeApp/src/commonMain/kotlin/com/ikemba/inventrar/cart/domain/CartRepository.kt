@@ -17,8 +17,8 @@ interface CartRepository {
 
 
     suspend fun holdOrder(accessToken: String, postSalesRequest: PostSalesRequest): Result<ResponseDto?, DataError>
-    suspend fun postCartSales(accessToken: String, postSalesRequest: PostSalesRequest): Result<ResponseDto?, DataError>
-    suspend fun getOrderReceipt(accessToken: String, voidOrderRequest: VoidOrderRequest): Result<ReceiptResponseDto?, DataError>
+    suspend fun postCartSales(postSalesRequest: PostSalesRequest): Result<ResponseDto?, DataError>
+    suspend fun getOrderReceipt(voidOrderRequest: VoidOrderRequest): Result<ReceiptResponseDto?, DataError>
     suspend fun saveCart(cart: CartEntity): EmptyResult<DataError.Local>
     suspend fun deleteCart(cartId: String): EmptyResult<DataError.Local>
     suspend fun updateCart(cart: CartEntity): EmptyResult<DataError.Local>

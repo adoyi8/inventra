@@ -28,15 +28,16 @@ import com.ikemba.inventrar.splashScreen.presentation.SplashScreenViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import com.ikemba.inventrar.auth.GoogleAuthUiProvider
+import com.ikemba.inventrar.business.presentation.BusinessListViewModel
 import com.ikemba.inventrar.business.presentation.BusinessViewModel
 import com.ikemba.inventrar.dashboard.presentation.components.ConfirmLogout
 import com.ikemba.inventrar.dropdowndata.presentation.DropDownSettingsViewModel
 import com.ikemba.inventrar.theme.AppTheme
-import com.ikemba.inventrar.user.presentation.ShrineProfileApp
+import com.ikemba.inventrar.user.presentation.ProfileScreen
 
 @Composable
 @Preview
-fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel = koinViewModel<UserViewModel>(), businessViewModel: BusinessViewModel = koinViewModel(), dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(),adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider,  ) {
+fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, businessViewModel: BusinessViewModel = koinViewModel(), dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(),adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()  ) {
     AppTheme {
         val navController = rememberNavController()
 
@@ -53,18 +54,6 @@ fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewM
             navigation<Route.BookGraph>(
                 startDestination = Route.SplashScreen
             ) {
-                composable<Route.SplashScreen>(
-                    exitTransition = { slideOutHorizontally() },
-                    popEnterTransition = { slideInHorizontally() }
-                ) {
-
-                    val viewModel = koinViewModel<SplashScreenViewModel>()
-
-
-                    SplashScreenRoot(
-                        viewModel = viewModel,
-                    )
-                }
                 composable<Route.POSScreen>(
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }
@@ -93,7 +82,7 @@ fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewM
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }
                 ) {
-                    ShrineProfileApp(userViewModel = userViewModel, businessViewModel = businessViewModel, dropDownSettingsViewModel = dropDownSettingsViewModel)
+                    ProfileScreen()
                 }
                 composable<Route.AdminMenuRoute>(
                     exitTransition = { slideOutHorizontally() },

@@ -21,11 +21,11 @@ import com.ikemba.inventrar.dashboard.data.mappers.toCategoryEntity
 import com.ikemba.inventrar.dashboard.data.mappers.toItem
 import com.ikemba.inventrar.dashboard.data.mappers.toItemEntity
 import com.ikemba.inventrar.dashboard.domain.Category
-import com.ikemba.inventrar.dashboard.domain.Item
 import com.ikemba.inventrar.dashboard.domain.ProductRepository
 import com.ikemba.inventrar.dashboard.utils.Util
 import com.ikemba.inventrar.heldOrder.data.dto.SingleHeldOrderDto
 import com.ikemba.inventrar.heldOrder.data.dto.VoidOrderRequest
+import com.ikemba.inventrar.inventory.data.domain.model.Product
 import com.ikemba.inventrar.user.domain.UserRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -45,7 +45,8 @@ class DashboardViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-) : ViewModel() {
+) : ViewModel()
+{
     private val _state = MutableStateFlow(DashboardState())
     private var observeUsers: Job? = null
     private var observeCategory: Job? = null
@@ -113,7 +114,7 @@ class DashboardViewModel(
             .onEach { items ->
                 _state.update { it ->
                     it.copy(
-                        visibleItems = items.map { it.toItem() }
+                        visibleProducts = items.map { it.toItem() }
                     )
                 }
             }
@@ -127,7 +128,7 @@ class DashboardViewModel(
             .onEach { items ->
                 _state.update { it ->
                     it.copy(
-                        allItems = items.map { it.toItem() }
+                        allProducts = items.map { it.toItem() }
                     )
                 }
             }
@@ -145,7 +146,7 @@ class DashboardViewModel(
                     )
                 }
                 if(users.isNotEmpty()) {
-                    Util.accessToken = users.last().accessToken!!
+//                    Util.accessToken = users.last().accessToken!!
                     Util.CURRENCY_CODE = if(users.last().currencyEntity==null) "₦" else  StringEscapeUtils.unescapeHtml4(users.last().currencyEntity!!)
                     //getProducts()
                 }
@@ -232,22 +233,22 @@ class DashboardViewModel(
         }
     }
 
-    fun addItemToCart(item: Item) {
+    fun addItemToCart(product: Product) {
         if(state.value.cartItems.isEmpty() && state.value.reference.isNullOrEmpty()){
             _state.update {
                 it.copy(reference = Util.generateTransactionReference())
             }
         }
-        val currentCartItem = state.value.cartItems.filter { it.itemId == item.id }
+        val currentCartItem = state.value.cartItems.filter { it.itemId == product.id }
         if (currentCartItem.isEmpty()) {
             val cartItem = CartItem(
-                itemId = item.id,
-                itemName = item.name,
+                itemId = product.id,
+                itemName = product.name,
                 quantity = 1,
-                price = item.unitPrice,
-                vatRate = item.vat,
-                discount = item.discount,
-                image = item.image
+                price = product.unitPrice,
+                vatRate = product.vat,
+                discount = product.discount,
+              //  image = product.image
             )
             val currentItems: MutableList<CartItem> = mutableListOf()
             state.value.cartItems.forEach { item ->
@@ -392,17 +393,17 @@ class DashboardViewModel(
 
     fun selectCategory(categoryId: String) {
         if(categoryId != "All") {
-            val newItems = state.value.allItems.filter { it.categoryId == categoryId }
+            val newItems = state.value.allProducts.filter { it.categoryId == categoryId }
             _state.update { it ->
                 it.copy(
-                    visibleItems = newItems
+                    visibleProducts = newItems
                 )
             }
         }else{
-            val newItems = state.value.allItems
+            val newItems = state.value.allProducts
             _state.update { it ->
                 it.copy(
-                    visibleItems = newItems
+                    visibleProducts = newItems
                 )
             }
         }
@@ -410,10 +411,10 @@ class DashboardViewModel(
     }
 
     fun searchItems(query: String) {
-        val newItems = state.value.allItems.filter { it.name.contains(query, ignoreCase = true) }
+        val newItems = state.value.allProducts.filter { it.name.contains(query, ignoreCase = true) }
         _state.update { it ->
             it.copy(
-                visibleItems = newItems
+                visibleProducts = newItems
             )
         }
 
@@ -434,37 +435,49 @@ class DashboardViewModel(
 
     fun postSale() {
         viewModelScope.launch {
+            println("kdh 1")
             try {
                 _state.update {
-                    it.copy(showPostSalesDialog = MutableTransitionState(true))
+                    it.copy(showPostSalesDialog = MutableTransitionState(true), showCartSheet = false)
                 }
+                println("kdh 2")
                 val cart = Cart(items = state.value.cartItems)
+                println("kdh 3")
                 cart.paymentMethod = state.value.paymentMethod
+                println("kdh 4")
                 if(!state.value.reference.isNullOrEmpty()){
                     cart.reference = state.value.reference
+                    println("kdh 5")
+
                 }
                 else{
                     cart.reference = Util.generateTransactionReference()
+                    println("kdh 6")
+
                 }
 
+                println("kdh 7")
                 cart.paymentMethod = state.value.paymentMethod;
+                println("kdh 8")
                 val request = cart.toPostSalesRequest()
+                println("kdh 9")
                 request.is_held = false
-
+                println("kdh 10")
                 cartRepository.postCartSales(
-                    state.value.users!!.first()!!.accessToken!!,
                     request
                 ).onSuccess { response ->
 
 
+                    println("kdh 11 "+ response)
                     if (response!!.responseCode == 0) {
                         cartRepository.getOrderReceipt(
-                            state.value.users!!.first()!!.accessToken!!,
                             VoidOrderRequest(cart.reference)
                         ).onSuccess { receiptResponseDto ->
+                            println("mimi "+ receiptResponseDto?.data?.items?.size)
                             hideAllDialogs()
                             if (receiptResponseDto!!.responseCode == 0) {
                                 val receipt = receiptResponseDto.toReceipt()
+                                println("obi "+ receipt.reference)
                                 _state.update {
                                     it.copy(
                                         showPostSalesDialog = MutableTransitionState(false),
@@ -639,7 +652,6 @@ class DashboardViewModel(
                     val request = it.toPostSalesRequest()
                     request.is_held = false
                     cartRepository.postCartSales(
-                        state.value.users!!.first()!!.accessToken!!,
                         request
                     ).onSuccess { response ->
                         if (response?.responseCode == 0) {
@@ -683,21 +695,14 @@ class DashboardViewModel(
 
     fun addToCartFromScanner(qrCodeText: String){
 
-        println("starting 9")
         val productId = qrCodeText
-        println("starting 6 "+ productId)
-        println("starting 5 "+ state.value.allItems.size)
 
-        state.value.allItems.forEach {
-            println("show " + it.id)
-        }
-        val matchedProducts = state.value.allItems.filter { it.sku == productId.toString() }
+
+        val matchedProducts = state.value.allProducts.filter { it.sku == productId.toString() }
         if(matchedProducts.isEmpty()){
-            println("starting 8")
             showSnackBar("Item not found")
             return
         }
-        println("starting 7")
         val matchedItem = matchedProducts.first()
         addItemToCart(matchedItem)
     }
@@ -709,6 +714,12 @@ class DashboardViewModel(
     fun setPaymentMethod(paymentMethod: String){
         _state.update {
             it.copy(paymentMethod = paymentMethod)
+        }
+    }
+
+    fun showCartSheet(b: Boolean) {
+        _state.update {
+            it.copy(showCartSheet = b)
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.navigation.NavHostController
 
 object NavigationViewModel{
     var navController: NavHostController? = null
+    var businessNavController: NavHostController? = null
 
 
     fun navigate(route: String) {

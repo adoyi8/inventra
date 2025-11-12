@@ -263,7 +263,7 @@ fun CreateInventoryForm(
                     // Simulate button press animation
                     buttonScale = 0.95f
 
-                adminViewModel.addInventoryItem(userViewModel.getUser()!!)
+           //     adminViewModel.addInventoryItem(userViewModel.getUser()!!)
 
 
                 //}

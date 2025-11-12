@@ -4,32 +4,36 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 //import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,122 +48,143 @@ import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
 import com.ikemba.inventrar.dashboard.presentation.components.ChangePasswordDialog
 import com.ikemba.inventrar.dashboard.presentation.components.ConfirmLogout
 import com.ikemba.inventrar.dashboard.presentation.components.POSSCreenBody
-import com.ikemba.inventrar.dashboard.presentation.components.ProfileImage
 import com.ikemba.inventrar.dashboard.presentation.components.SavingSalesDialog
-import com.ikemba.inventrar.dashboard.presentation.components.TopMenu
 import com.ikemba.inventrar.heldOrder.presentation.HeldOrderScreen
 import com.ikemba.inventrar.login.presentation.UserViewModel
 import com.ikemba.inventrar.savedSales.presentation.SavedSalesScreen
 import com.ikemba.inventrar.transactionHistory.presentation.TransactionScreen
-import inventrar.composeapp.generated.resources.Res
-import inventrar.composeapp.generated.resources.inventra_logo_and_text
-import inventrar.composeapp.generated.resources.logout
-import org.jetbrains.compose.resources.painterResource
 
+
+@Suppress("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
 
-
     val state = viewModel.state.collectAsStateWithLifecycle()
 
-    Scaffold() {
-        Box(modifier = Modifier.fillMaxSize()){
-            Column(modifier = Modifier.fillMaxSize()) {
+    // --- New Responsive & Sheet State ---
+    val sheetState = rememberModalBottomSheetState()
 
-                // Top Bar
-                TopAppBar(
-                    navigationIcon = {
-                        Image(
-                            painter = painterResource(Res.drawable.inventra_logo_and_text),
-                            contentDescription = "Inventrar Logo",
-                            colorFilter = ColorFilter.tint(Color.White),
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    },
-                    title = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
+    // --- End New State ---
 
-                            TopMenu(viewModel)
+    BoxWithConstraints {
+        // Determine layout based on width. 600.dp is a common breakpoint.
+       // val isMobile = maxWidth < 600.dp
+        val isMobile = true
 
+        Scaffold(
+//            topBar = {
+//                TopAppBar(
+//                    navigationIcon = {
+//                        Image(
+//                            painter = painterResource(Res.drawable.inventra_logo_and_text),
+//                            contentDescription = "Inventrar Logo",
+//                            colorFilter = ColorFilter.tint(Color.White),
+//                            modifier = Modifier.padding(10.dp)
+//                        )
+//                    },
+//                    title = {
+////                        Row(
+////                            modifier = Modifier.fillMaxWidth(),
+////                            horizontalArrangement = Arrangement.SpaceBetween
+////                        )
+////                        {
+////
+////                            // Only show TopMenu in the app bar on desktop
+////                            if (!isMobile) {
+////                                TopMenu(viewModel)
+////                            }
+////
+////                            if (state.value.users.isNotEmpty()) {
+////                                Row(
+////                                    verticalAlignment = Alignment.CenterVertically,
+////                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+////                                ) {
+////                                    ProfileImage(
+////                                        imageUrl = state.value.users.first().businessLogo,
+////                                        content = {}
+////                                    )
+////                                    Column {
+////                                        CustomText(
+////                                            state.value.users.first().getFullName(),
+////                                            color = Color.White
+////                                        )
+////                                    }
+////                                    Icon(
+////                                        painter = painterResource(Res.drawable.logout),
+////                                        contentDescription = "Logout",
+////                                        tint = Color.White,
+////                                        modifier = Modifier.size(43.dp).padding(start = 8.dp)
+////                                            .clickable(
+////                                                onClick = { viewModel.showShowConfirmLogout() },
+////                                                enabled = state.value.users.isNotEmpty()
+////                                            )
+////                                    )
+////                                }
+////                            }
+////                        }
+//                    },
+//                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF236ff9))
+//                )
+//            },
+            // --- New Mobile Bottom Navigation Bar ---
+//            bottomBar = {
+//                if (isMobile) {
+//                    MobileBottomNavigation(viewModel, state.value.selectedMenuIndex.currentState)
+//                }
+//            }
+            // --- End New Bottom Bar ---
 
-                            if (state.value.users.isNotEmpty()) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    ProfileImage(
-                                        imageUrl = state.value.users.first().businessLogo,
-                                        content = {}
-                                    )
-                                    Column {
-                                        CustomText(
-                                            state.value.users.first().getFullName(),
-                                            color = Color.White
-                                        )
-                                    }
-//                                    TooltipArea(
-//                                        tooltip = {
-//                                            // composable tooltip content
-//                                            Surface(
-//                                                modifier = Modifier.shadow(4.dp),
-//                                                shape = RoundedCornerShape(4.dp)
-//                                            ) {
-//                                                CustomText(
-//                                                    text = "Logout",
-//                                                )
-//                                            }
-//                                        }, // in milliseconds
-//                                        // tooltip offset
-//                                    ) {
-                                        Icon(
-                                            painter = painterResource(Res.drawable.logout),
-                                            contentDescription = "Logout",
-                                            tint = Color.White,
-                                            modifier = Modifier.size(43.dp).padding(start = 8.dp)
-                                                .clickable(
-                                                    onClick = { viewModel.showShowConfirmLogout() },
-                                                    enabled = state.value.users.isNotEmpty()
-                                                )
-                                        )
-//                                    }
-                                }
-                           }
+        ) { padding ->
+            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
 
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF236ff9))
-                )
-
+                // --- POS View (Index 0) ---
                 AnimatedVisibility(
                     visible = state.value.selectedMenuIndex.currentState == 0,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            POSSCreenBody(viewModel = viewModel, modifier = Modifier.weight(12f))
-                            CartScreen(viewModel = viewModel,modifier = Modifier.weight(8f))
-                        }
-                        ConfirmTransactionDialog(viewModel = viewModel,text = "Are you sure you want to proceed")
-                        PaymentMethodNotAvailableDialog(viewModel = viewModel,text = "Are you sure you want to proceed")
-                        PostingSalesDialog(viewModel = viewModel,text = "Please wait...")
 
-                        val onDismiss = {
-                            viewModel.toggleShowReceipt(false)
+                        // --- RESPONSIVE LAYOUT LOGIC ---
+                        if (isMobile) {
+                            // Mobile: Just the body, and a FAB to open the cart
+                            POSSCreenBody(
+                                viewModel = viewModel,
+                                modifier = Modifier.fillMaxSize(),
+                                isMobile = true,
+                                onShowCart = { viewModel.showCartSheet(true) } // Lambda to open sheet
+                            )
+                        } else {
+                            // Desktop: Side-by-side layout
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                POSSCreenBody(
+                                    viewModel = viewModel,
+                                    modifier = Modifier.weight(12f),
+                                    isMobile = false,
+                                    onShowCart = {} // Not needed on desktop
+                                )
+                                CartScreen(viewModel = viewModel, modifier = Modifier.weight(8f))
+                            }
                         }
+                        // --- END RESPONSIVE LOGIC ---
+
+                        // Dialogs remain the same...
+                        ConfirmTransactionDialog(viewModel = viewModel, text = "Are you sure you want to proceed")
+                        PaymentMethodNotAvailableDialog(viewModel = viewModel, text = "Are you sure you want to proceed")
+                        PostingSalesDialog(viewModel = viewModel, text = "Please wait...")
+                        val onDismiss = { viewModel.toggleShowReceipt(false) }
                         ReceiptDialog(state.value.showReceipt, onDismiss, state.value.receiptModel)
                     }
                 }
+
+                // Other AnimatedVisibility screens
                 AnimatedVisibility(
                     visible = state.value.selectedMenuIndex.currentState == 1,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
-                    HeldOrderScreen(dashboardViewModel =viewModel )
+                    HeldOrderScreen(dashboardViewModel = viewModel)
                 }
                 AnimatedVisibility(
                     visible = state.value.selectedMenuIndex.currentState == 2,
@@ -180,14 +205,26 @@ fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
-                SettingsScreen(viewModel)
+                    SettingsScreen(viewModel)
                 }
                 ConfirmLogout(viewModel = userViewModel)
-                ChangePasswordDialog(viewModel= viewModel)
+                ChangePasswordDialog(viewModel = viewModel)
                 SavingSalesDialog(viewModel = viewModel)
 
             }
-            SnackbarHost(hostState = viewModel.state.value.snackBarHostState, modifier = Modifier.align(Alignment.Center))
+            SnackbarHost(hostState = state.value.snackBarHostState, modifier = Modifier.align(Alignment.Center))
+
+            // --- New Modal Bottom Sheet for Mobile Cart ---
+            if (state.value.showCartSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { viewModel.showCartSheet(false) },
+                    sheetState = sheetState
+                ) {
+                    // We can reuse the same CartScreen composable!
+                    CartScreen(viewModel = viewModel, modifier = Modifier.fillMaxSize())
+                }
+            }
+            // --- End New Sheet ---
         }
     }
 }
@@ -224,3 +261,32 @@ fun SettingsScreen(viewModel: DashboardViewModel) {
     }
 }
 
+@Composable
+fun MobileBottomNavigation(viewModel: DashboardViewModel, selectedIndex: Int) {
+    // Assuming you have a list of items for your TopMenu
+    val menuItems = listOf("POS", "Held", "Transactions", "Saved", "Settings")
+
+    NavigationBar {
+        menuItems.forEachIndexed { index, title ->
+            NavigationBarItem(
+                selected = selectedIndex == index,
+                onClick = { viewModel.onMenuSelected(index) },
+                label = { CustomText(title) }, // Use your CustomText
+                icon = {
+                    // Replace with your actual icons
+                    Icon(
+                        imageVector = when (index) {
+                            0 -> Icons.Default.Menu
+                            1 -> Icons.Default.Star
+                            2 -> Icons.Default.Star
+                            3 -> Icons.Default.Clear
+                            4 -> Icons.Default.ArrowDropDown
+                            else -> Icons.Default.Clear
+                        },
+                        contentDescription = title
+                    )
+                }
+            )
+        }
+    }
+}

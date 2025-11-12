@@ -22,6 +22,6 @@ import com.ikemba.inventrar.core.presentation.PrimaryColor
 @Composable
 fun PaginationButton(onClick:()-> Unit= {}, text: String, enabled: Boolean, modifier: Modifier = Modifier){
     return Button(modifier = modifier, onClick = onClick, colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor, disabledContainerColor = Color.White, disabledContentColor = Color.Gray, contentColor = Color.White), enabled = enabled, border = BorderStroke(1.dp, Color.Gray), shape = RectangleShape){
-        Text(text)
+        CustomText(text = text, color = if (enabled) Color.White else Color.Gray)
     }
 }

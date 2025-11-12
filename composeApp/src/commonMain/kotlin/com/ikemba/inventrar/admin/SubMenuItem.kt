@@ -25,8 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikemba.inventrar.app.Route
 import com.ikemba.inventrar.core.presentation.NavigationViewModel
+import com.ikemba.inventrar.core.presentation.components.CustomText
 import inventrar.composeapp.generated.resources.Res
+import inventrar.composeapp.generated.resources.branch
+import inventrar.composeapp.generated.resources.department
 import inventrar.composeapp.generated.resources.eye_icon
+import inventrar.composeapp.generated.resources.grocery
+import inventrar.composeapp.generated.resources.inventory
+import inventrar.composeapp.generated.resources.person
+import inventrar.composeapp.generated.resources.roles_and_permission
+import inventrar.composeapp.generated.resources.staff
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -40,22 +48,58 @@ fun TwoStepMenuScreen() {
     // Sample data for the menu
     val menuItems = listOf(
         MenuItem(
-            title = "Profile",
-            subItems = listOf(SubMenuItem("Edit Profile"), SubMenuItem("Change Password"), SubMenuItem("Privacy Settings"))
+            title = "Staff",
+            subItems = listOf(
+                SubMenuItem("Add Staff", onClick = { NavigationViewModel.businessNavController?.navigate(Route.AddStaffRoute)}),
+                SubMenuItem("View Staff", onClick = { NavigationViewModel.businessNavController?.navigate(Route.StaffListRoute)}),
+                ),
+            icon = Res.drawable.staff
         ),
+        MenuItem(
+            title = "Departments",
+            subItems = listOf(
+                SubMenuItem("View Departments", onClick = { NavigationViewModel.businessNavController?.navigate(Route.DepartmentListRoute)}),
+                SubMenuItem("Add Department", onClick = { NavigationViewModel.businessNavController?.navigate(Route.CreateEditDepartmentRoute)}),
+                ),
+            icon = Res.drawable.department
+        ),
+        MenuItem(
+            title = "Branches",
+            subItems = listOf(
+                SubMenuItem("View Branches", onClick = { NavigationViewModel.businessNavController?.navigate(Route.BranchManagementRoute)}),
+            ),
+            icon = Res.drawable.branch
+        ),
+        MenuItem(
+            title = "Roles and Permissions",
+            subItems = listOf(
+                SubMenuItem("Manage Roles", onClick = { NavigationViewModel.businessNavController?.navigate(Route.RoleManagementRoute)}),
+                ),
+            icon = Res.drawable.roles_and_permission
+        ),
+        MenuItem(
+            title = "Products",
+            subItems = listOf(
+                SubMenuItem("Products", onClick = { NavigationViewModel.businessNavController?.navigate(Route.ProductListRoute)}),
+                SubMenuItem("Add Product", onClick = { NavigationViewModel.businessNavController?.navigate(Route.AddProductRoute)}),
+                SubMenuItem("Categories", onClick = { NavigationViewModel.businessNavController?.navigate(Route.CategoryListRoute)}),
+                SubMenuItem("Add Categories", onClick = { NavigationViewModel.businessNavController?.navigate(Route.AddCategory)}),
+            ),
+            icon = Res.drawable.grocery
+        ),
+
+
         MenuItem(
             title = "Inventory",
-            subItems = listOf(SubMenuItem("Add Item", onClick = { NavigationViewModel.navController?.navigate(
-                Route.AddItemToInventoryRoute)}), SubMenuItem("Email Notifications"), SubMenuItem("SMS Alerts"))
+            subItems = listOf(
+                SubMenuItem("Locations", onClick = { NavigationViewModel.businessNavController?.navigate(Route.LocationListRoute)}),
+                SubMenuItem("Stock Movements", onClick = { NavigationViewModel.businessNavController?.navigate(Route.StockMovementListRoute)}),
+                SubMenuItem("Stock Transfer", onClick = { NavigationViewModel.businessNavController?.navigate(Route.StockTransferRoute)}),
+                SubMenuItem("Audit Trail", onClick = { NavigationViewModel.businessNavController?.navigate(Route.AuditTrailRoute)})
+            ),
+            icon = Res.drawable.inventory
         ),
-        MenuItem(
-            title = "Appearance",
-            subItems = listOf(SubMenuItem("Theme"), SubMenuItem("Font Size"), SubMenuItem("Dark Mode"))
-        ),
-        MenuItem(
-            title = "Support",
-            subItems = listOf(SubMenuItem("Help Center"), SubMenuItem("Contact Us"), SubMenuItem("FAQ"))
-        )
+
     )
 
     var expandedItem by remember { mutableStateOf<MenuItem?>(null) }
@@ -104,9 +148,10 @@ fun MenuItemCard(
             ) {
                 Image(painter = painterResource(menuItem.icon), contentDescription = "${menuItem.title} Icon")
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(
+                CustomText(
                     text = menuItem.title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    fontWeight = FontWeight.Bold,
+                     size = 16.sp
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
@@ -143,9 +188,9 @@ fun SubMenuItemView(subItem: SubMenuItem) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.width(40.dp)) // For indentation
-        Text(
+        CustomText(
             text = subItem.title,
-            style = MaterialTheme.typography.bodyLarge
+            size = 16.sp
         )
     }
 }

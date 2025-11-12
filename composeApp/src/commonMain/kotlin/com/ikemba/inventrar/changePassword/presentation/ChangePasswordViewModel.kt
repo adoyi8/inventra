@@ -36,7 +36,7 @@ class ChangePasswordViewModel(
                             it.copy(errorMessage = response?.responseMessage.toString(), isLoading = false)
                         }
                     }
-                    println("Amad "+ response)
+
                 }
                 .onError { error->
                     _state.update {

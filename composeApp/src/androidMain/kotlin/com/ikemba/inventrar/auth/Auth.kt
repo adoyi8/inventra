@@ -43,10 +43,10 @@ actual class GoogleAuthUiProvider(private val context: Context) {
             val account = task.getResult(Exception::class.java)
             signInContinuation?.invoke(account, null)
         } catch (e: Exception) {
-            println("Jummai 2 "+ e.message)
+
             signInContinuation?.invoke(null, e)
         } catch (e: Exception) {
-            println("Jummai 3 "+ e.message)
+
             signInContinuation?.invoke(null, e)
         } finally {
             signInContinuation = null // Clear the continuation after use
@@ -71,16 +71,12 @@ actual class GoogleAuthUiProvider(private val context: Context) {
             // Store the continuation so handleSignInIntentResult can resume it
             signInContinuation = { account, exception ->
 
-                println("awari ")
                 if (continuation.isActive) {
                     if (account != null) {
-                        println("awari 2")
                         continuation.resume(account)
                     } else if (exception != null) {
-                        println("awari 3 "+ exception.message)
                         continuation.resumeWithException(exception)
                     } else {
-                        println("awari 4")
                         // Should not happen, but for safety
                         continuation.resumeWithException(IllegalStateException("Google Sign-In failed with no account or exception."))
                     }
@@ -99,7 +95,6 @@ actual class GoogleAuthUiProvider(private val context: Context) {
                 val credential = GoogleAuthProvider.credential(account.idToken!!, null)
                 Firebase.auth.signInWithCredential(credential).user
             } catch (e: Exception) {
-                println("Jummai "+ e.message)
                 e.printStackTrace()
                 null
             }
@@ -112,26 +107,4 @@ actual class GoogleAuthUiProvider(private val context: Context) {
         googleSignInClient.signOut().await() // Use await for GMS Task
         Firebase.auth.signOut() // Sign out from GitLive Firebase Auth
     }
-}
-private suspend fun firebaseAuthWithGoogle(googleIdCredential: GoogleIdTokenCredential) : FirebaseUser?{
-    val auth = Firebase.auth
-    var user: FirebaseUser? = null
-    try {
-        // 5. Use the token to create a GitLive Firebase credential
-        val credential = GoogleAuthProvider.credential(
-            idToken = googleIdCredential.idToken,
-            accessToken = null // Access token is not needed for this flow
-        )
-
-        // 6. Sign in to Firebase with the GitLive library
-        val authResult = auth.signInWithCredential(credential)
-         user = authResult.user
-        println("Jummai: Firebase sign-in successful! User: ${user?.displayName}")
-        // --- Navigate to your main screen or update UI ---
-
-    } catch (e: Exception) {
-        println("Jummai 3: Firebase authentication failed: ${e.message}")
-        // Handle Firebase authentication errors
-    }
-    return user;
 }

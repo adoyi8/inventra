@@ -1,13 +1,14 @@
 package com.ikemba.inventrar.user.data.mappers
 
 
+import com.google.firebase.auth.FirebaseUser
 import com.ikemba.inventrar.user.data.database.UserEntity
 import com.ikemba.inventrar.user.data.dto.UserLoginResponseDto
 import com.ikemba.inventrar.user.domain.User
 
 
 fun UserLoginResponseDto.toUser(): User {
-    println("sarank 1 "+ employee?.employeeId)
+
     return User(
         firstname= employee?.firstName,
     lastname = employee?.lastName,
@@ -18,9 +19,18 @@ fun UserLoginResponseDto.toUser(): User {
         userId = employee?.employeeId
     )
 }
+fun FirebaseUser.toUser(): User {
+
+    return User(
+        firstname= displayName,
+        email  = email,
+        userId = uid
+    )
+}
+
+
 
 fun User.toUserEntity(): UserEntity {
-    println("sarank 2 "+ userId)
     return UserEntity(
         id = id,
         firstname= firstname,
@@ -48,13 +58,11 @@ fun User.toUserEntity(): UserEntity {
         defaultTax = defaultTax,
         accessToken = accessToken,
         userId = userId,
-        organizationId = organizationId,
-        organizationName = organizationName
+        organizationId = businessId,
     )
 }
 
 fun UserEntity.toUser(): User {
-    println("sarank 3"+ userId)
     return User(
         id = id,
         firstname= firstname,
@@ -82,7 +90,6 @@ fun UserEntity.toUser(): User {
         defaultTax = defaultTax,
         accessToken = accessToken,
         userId = userId,
-        organizationId = organizationId,
-        organizationName = organizationName
+        businessId = organizationId,
     )
 }

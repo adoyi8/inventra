@@ -16,17 +16,24 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
+import inventrar.composeapp.generated.resources.Res
+import inventrar.composeapp.generated.resources.person
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun BlurredImageBackground(
     imageUrl: String?,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
 ) {
     var imageLoadResult by remember {
         mutableStateOf<Result<Painter>?>(null)
     }
     val painter = rememberAsyncImagePainter(
+        placeholder = painterResource(Res.drawable.person),
+        error = painterResource(Res.drawable.person),
+        fallback = painterResource(Res.drawable.person),
+
+
         model = imageUrl,
         onSuccess = {
             val size = it.painter.intrinsicSize

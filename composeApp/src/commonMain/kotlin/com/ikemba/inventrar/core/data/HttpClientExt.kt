@@ -30,11 +30,9 @@ suspend inline fun <reified T> safeCall(
     }
     catch (e: Exception) {
         coroutineContext.ensureActive()
-        println("alden 2 "+ e.message)
         return Result.Error(DataError.Remote.UNKNOWN)
     }
 
-    println("alden "+ response)
     return responseToResult(response)
 }
 

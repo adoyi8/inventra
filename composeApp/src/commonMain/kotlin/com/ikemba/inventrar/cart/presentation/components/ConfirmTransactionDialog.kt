@@ -28,7 +28,6 @@ fun ConfirmTransactionDialog(viewModel: DashboardViewModel, text: String) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     AnimatedVisibility(visibleState = state.value.showConfirmTransaction) {
         AlertDialog(
-            containerColor = SecondaryColor,
             onDismissRequest = {},
             title = { CustomText("Confirm") },
             confirmButton = {
@@ -60,7 +59,6 @@ fun PaymentMethodNotAvailableDialog(viewModel: DashboardViewModel, text: String)
     AnimatedVisibility(visibleState = state.value.showPaymentMethodNotAvailableDialog) {
         AlertDialog(
 
-            containerColor = SecondaryColor,
             onDismissRequest = {
             },
             title = { CustomText("Info") },
@@ -86,7 +84,6 @@ fun PostingSalesDialog(viewModel: DashboardViewModel, text: String) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     AnimatedVisibility(visibleState = state.value.showPostSalesDialog) {
         AlertDialog(
-            containerColor = SecondaryColor,
             onDismissRequest = {},
             title = { CustomText("Posting Sales ...") },
             confirmButton = {

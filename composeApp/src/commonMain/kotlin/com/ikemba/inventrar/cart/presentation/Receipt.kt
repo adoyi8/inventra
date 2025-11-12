@@ -6,8 +6,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +27,9 @@ import printReceiptGem
 fun ReceiptScreen(receiptModel: ReceiptModel) {
 
     val padding = 20.dp
+    LaunchedEffect(receiptModel){
+        println("amir "+ receiptModel.cartItems.size)
+    }
     Box(
         modifier = Modifier.fillMaxWidth()
 
@@ -41,33 +46,34 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
                 .fillMaxWidth().heightIn(max = 3000.dp, min = 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            receiptModel.logo?.let {
-                val painter = rememberAsyncImagePainter(
-                    model = receiptModel.logo,
-                    onSuccess = {
-                        val size = it.painter.intrinsicSize
-                        val imageLoadResult = if (size.width > 1 && size.height > 1) {
-                            Result.success(it.painter)
-                        } else {
-                            Result.failure(Exception("Invalid image dimensions"))
-                        }
-                    },
-                    onError = {
-                        it.result.throwable.printStackTrace()
-                    }
-                )
-                // Logo and Title
-                Image(
-                    painter = painter,
-                    contentDescription = "Logo",
-                    modifier = Modifier.width(200.dp)
-                )
-            }
+//            receiptModel.logo?.let {
+//                val painter = rememberAsyncImagePainter(
+//                    model = receiptModel.logo,
+//                    onSuccess = {
+//                        val size = it.painter.intrinsicSize
+//                        val imageLoadResult = if (size.width > 1 && size.height > 1) {
+//                            Result.success(it.painter)
+//                        } else {
+//                            Result.failure(Exception("Invalid image dimensions"))
+//                        }
+//                    },
+//                    onError = {
+//                        it.result.throwable.printStackTrace()
+//                    }
+//                )
+//                // Logo and Title
+//                Image(
+//                    painter = painter,
+//                    contentDescription = "Logo",
+//                    modifier = Modifier.width(200.dp)
+//                )
+//            }
 
-            Text(
+            CustomText(
                 text = receiptModel!!.address,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(top = padding)
+                size = 20.sp,
+                modifier = Modifier.padding(top = padding),
+                color = Color.DarkGray
             )
 
 
@@ -76,12 +82,14 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
                 text = "Thank you for your Patronage!",
                 fontWeight = FontWeight.Bold,
                 size = 16.sp,
-                modifier = Modifier.padding(top = padding)
+                modifier = Modifier.padding(top = padding),
+                color = Color.DarkGray
             )
             CustomText(
                 text = "Order No ${receiptModel.reference}",
                 size = 14.sp,
-                modifier = Modifier.padding(top = padding)
+                modifier = Modifier.padding(top = padding),
+                color = Color.DarkGray
             )
 
 
@@ -90,9 +98,9 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
                 modifier = Modifier.fillMaxWidth().padding(top = padding),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                CustomText(text = "Invoice: ${receiptModel.reference}", size = 14.sp)
-                CustomText(text = ((receiptModel.date)), size = 14.sp)
-                CustomText(text = (receiptModel.time), size = 14.sp)
+                CustomText(text = "Invoice: ${receiptModel.reference}", size = 14.sp, color = Color.DarkGray)
+                CustomText(text = ((receiptModel.date)), size = 14.sp, color = Color.DarkGray)
+                CustomText(text = (receiptModel.time), size = 14.sp, color = Color.DarkGray)
             }
 
 
@@ -101,7 +109,7 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 repeat(30) {
-                    Text("-")
+                    Text("-", color = Color.DarkGray)
                 }
             }
             Row(
@@ -109,20 +117,23 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                Text(text = "Item", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text(
+                CustomText(text = "Item", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f), color = Color.DarkGray)
+                CustomText(
                     text = "Price(${Util.CURRENCY_CODE})",
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    color = Color.DarkGray
                 )
-                Text(text = "Qty", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text(
+                CustomText(text = "Qty", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f), color = Color.DarkGray)
+                CustomText(
                     text = "Total(${Util.CURRENCY_CODE})",
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    color = Color.DarkGray
                 )
 
             }
+
 
 
 
@@ -133,10 +144,10 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
                         modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = item.itemName!!, modifier = Modifier.weight(1f))
-                        Text(text = currencyFormat(item.price), modifier = Modifier.weight(1f))
-                        Text(text = item.quantity.toString(), modifier = Modifier.weight(1f))
-                        Text(text = currencyFormat(item.price * item.quantity), modifier = Modifier.weight(1f))
+                        CustomText(text = item.itemName!!, modifier = Modifier.weight(1f), color = Color.DarkGray)
+                        CustomText(text = currencyFormat(item.price), modifier = Modifier.weight(1f), color = Color.DarkGray)
+                        CustomText(text = item.quantity.toString(), modifier = Modifier.weight(1f), color = Color.DarkGray)
+                        CustomText(text = currencyFormat(item.price * item.quantity), modifier = Modifier.weight(1f), color = Color.DarkGray)
                     }
                 }
             }
@@ -145,7 +156,7 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 repeat(30) {
-                    Text("-")
+                    CustomText("-", color = Color.DarkGray)
                 }
             }
 
@@ -157,38 +168,38 @@ fun ReceiptScreen(receiptModel: ReceiptModel) {
             ) {
 
                 Row(modifier = Modifier.width(200.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    CustomText(text = "Subtotal ")
-                    CustomText(text = currencyFormat(receiptModel.subTotal))
+                    CustomText(text = "Subtotal ", color = Color.DarkGray)
+                    CustomText(text = currencyFormat(receiptModel.subTotal), color = Color.DarkGray)
                 }
                 Row(modifier = Modifier.width(200.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    CustomText(text = "Discount ")
-                    CustomText(text = currencyFormat(receiptModel.discount))
+                    CustomText(text = "Discount ", color = Color.DarkGray)
+                    CustomText(text = currencyFormat(receiptModel.discount), color = Color.DarkGray)
                 }
 
                 Row(modifier = Modifier.width(200.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    CustomText(text = "TAX ")
-                    CustomText(text = currencyFormat(receiptModel.taxTotal))
+                    CustomText(text = "TAX ", color = Color.DarkGray)
+                    CustomText(text = currencyFormat(receiptModel.taxTotal), color = Color.DarkGray)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = padding),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     repeat(30) {
-                        Text("-")
+                        CustomText("-", color = Color.DarkGray)
                     }
                 }
                 Row(modifier = Modifier.width(200.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    CustomText(text = "Total ", fontWeight = FontWeight.Bold, size = 18.sp)
+                    CustomText(text = "Total ", fontWeight = FontWeight.Bold, size = 18.sp, color = Color.DarkGray)
                     CustomText(
                         text = currencyFormat(receiptModel.grandTotal),
                         fontWeight = FontWeight.Bold,
-                        size = 18.sp
+                        size = 18.sp, color = Color.DarkGray
                     )
                 }
             }
 
             Row(modifier = Modifier.fillMaxWidth().padding(top = padding), horizontalArrangement = Arrangement.Start) {
-                CustomText(text = "Cashier: ${receiptModel.cashier}", size = 14.sp)
+                CustomText(text = "Cashier: ${receiptModel.cashier}", size = 14.sp, color = Color.DarkGray)
             }
 
             // Print Receipt Button

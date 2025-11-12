@@ -48,12 +48,11 @@ class SplashScreenViewModel(
                 _state.update { it.copy(
                     users = users
                 ) }
-                println("Alamo users ${users.size}")
                 if(users.isEmpty()){
                     NavigationViewModel.navController?.navigate(Route.Login)
                 }
                 else{
-                  Util.accessToken = users.last().accessToken.toString()
+           ///       Util.accessToken = users.last().accessToken.toString()
                    // NavigationViewModel.navController?.navigate(Route.Login)
                     NavigationViewModel.navController?.navigate(Route.UserProfileRoute)
                 }
@@ -69,18 +68,15 @@ class SplashScreenViewModel(
                 .onSuccess { userResponse ->
 
                     if(userResponse?.responseCode == 0){
-                        println("Liv 1")
+
                     }
                     else{
-                        println("Liv 2")
                         _state.update {
                             it.copy(errorMessage = userResponse?.responseMessage.toString(), isLoading = false)
                         }
                     }
-                    println("Amad "+ userResponse)
                 }
                 .onError { error->
-                    println("Liv 3")
                     _state.update {
                         it.copy(errorMessage = error.toUiText().toString(), isLoading = false) }
 

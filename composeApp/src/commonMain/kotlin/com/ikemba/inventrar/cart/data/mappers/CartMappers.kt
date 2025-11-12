@@ -23,15 +23,23 @@ fun Cart.toCartEntity(): CartEntity {
 }
 
 fun Cart.toPostSalesRequest(): PostSalesRequest {
+    println("ndiaye 1")
     val result = PostSalesRequest()
+    println("ndiaye 2")
     result.payment_method = this.paymentMethod
+    println("ndiaye 3")
     result.reference = reference
+    println("ndiaye 4")
     result.total = this.getTotal()
+    println("ndiaye 5")
     result.total_vat = this.getTotalVat()
+    println("ndiaye 6")
     result.grandTotal = this.getGrandTotal()
+    println("ndiaye 7")
     result.cart = this.items.map {
-        PostSalesItem(product_id = it.itemId!!.toInt(), product_name = it.itemName, qty = it.quantity.toString(),subtotal = it.getSubTotal(), vat_rate = it.returnVatRate(), vat_amount = it.getVatAmount(), discount = it.discount.toString())
+        PostSalesItem(product_id = it.itemId!!, product_name = it.itemName, qty = it.quantity.toString(),subtotal = it.getSubTotal(), vat_rate = it.returnVatRate(), vat_amount = it.getVatAmount(), discount = it.discount.toString())
     }
+    println("ndiaye 8")
     return result
 
 }
@@ -80,7 +88,7 @@ fun PostSalesModel.toPostSalesRequest(): PostSalesRequest {
     )
     result.cart = this.cart!!.map {
         PostSalesItem(
-            product_id = it.product_id!!.toInt(),
+            product_id = it.product_id!!,
             product_name = it.product_name,
             qty = it.qty,
             subtotal = it.subtotal,

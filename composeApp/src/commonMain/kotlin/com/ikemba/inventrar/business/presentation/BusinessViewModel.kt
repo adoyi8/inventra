@@ -14,6 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.ikemba.inventrar.auth.GoogleAuthUiProvider
 import com.ikemba.inventrar.business.data.domain.BusinessRepository
+import com.ikemba.inventrar.business.data.domain.model.AppUser
+import com.ikemba.inventrar.business.data.domain.useCase.CreateBusinessUseCase
+import com.ikemba.inventrar.business.data.domain.useCase.GetBusinessesForUserUseCase
 import com.ikemba.inventrar.business.data.dto.CreateBusinessRequest
 import com.ikemba.inventrar.business.data.dto.SearchOrganizationRequest
 import com.ikemba.inventrar.dropdowndata.data.domain.DropDownSettingsRepository
@@ -28,7 +31,6 @@ import com.ikemba.inventrar.inventory.presentation.CreateBusinessFormState
 class BusinessViewModel(
     private val settingsRepository: DropDownSettingsRepository,
     private val businessRepository: BusinessRepository,
-    private val savedStateHandle: SavedStateHandle
 ): ViewModel(){
     private val _state = MutableStateFlow(BusinessState())
     private val _createBusinessFormState = MutableStateFlow(CreateBusinessFormState())

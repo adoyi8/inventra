@@ -26,7 +26,7 @@ class KtorRemoteCartDataSource(
 
 
     override suspend fun postSales(accessToken: String, postSalesRequest: PostSalesRequest): Result<ResponseDto, DataError.Remote> {
-        println("eze "+ Json.encodeToString(postSalesRequest))
+
         return safeCall<ResponseDto> {
             httpClient.post(
                 urlString = "$BASE_URL/post_sales"
@@ -42,7 +42,6 @@ class KtorRemoteCartDataSource(
         }
     }
     override suspend fun holdOrder(accessToken: String, postSalesRequest: PostSalesRequest): Result<ResponseDto, DataError.Remote> {
-        println("eze "+ Json.encodeToString(postSalesRequest))
         return safeCall<ResponseDto> {
             httpClient.post(
                 urlString = "$BASE_URL/hold"

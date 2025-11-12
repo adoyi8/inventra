@@ -2,17 +2,21 @@ package com.ikemba.inventrar.login.presentation
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.rememberScrollState // <-- Import this
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,6 +47,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,236 +66,135 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Composable
-fun LoginScreenRoot(
-    viewModel: UserViewModel, googleAuthProvider: GoogleAuthUiProvider
-){
 
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    Column(
-        modifier = Modifier
-           .fillMaxSize()
-           .background(Color(0xFFF5F5F5)), // Light gray background
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+
+
+
+@Composable
+fun LoginVisuals(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .background(Color(0xFFc9d8f7)), // Light blue background
+        contentAlignment = Alignment.Center
     ) {
-        LoginScreen(
-            state = state,
-            onAction = { action ->
-                viewModel.onAction(action)
-            },
-            googleAuthProvider = googleAuthProvider
+        // Decorative background circle
+        Box(
+            modifier = Modifier
+                .fillMaxSize(0.7f)
+                .clip(CircleShape)
+                .background(Color(0xFF1E73E8))
+        )
+        // Main Image
+        Image(
+            painter = painterResource(Res.drawable.pos_image),
+            contentDescription = "POS System",
+            modifier = Modifier.fillMaxSize(0.5f)
         )
     }
 }
+
+    // <-- Import this
+
 @Composable
-fun LoginScreen(
+fun LoginForm(
+    modifier: Modifier = Modifier,
     state: LoginState,
-    onAction: (LoginAction)-> Unit,
+    onAction: (LoginAction) -> Unit,
     googleAuthProvider: GoogleAuthUiProvider
 ) {
+    val passwordVisible = remember { mutableStateOf(false) }
+    // ✨ 1. Remember the scroll state
+    val scrollState = rememberScrollState()
 
-
-
-    // Trigger animation after composition
-    LaunchedEffect(Unit) {
-        delay(500)
-        state.isVisible = true
-    }
-    val passwordVisible = remember{mutableStateOf(false)}
-
-    Box(Modifier.fillMaxSize()) {
-
-
-        Row(modifier = Modifier.fillMaxSize()) {
-            // Left Image Section
-            Box(
-                modifier = Modifier
-                    .weight(0.01f).fillMaxHeight()
-                    .background(Color(0xFFc9d8f7)), // Light blue background
-                contentAlignment = Alignment.Center
-            ) {
-                this@Row.AnimatedVisibility(
-                    visible = state.isVisible,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(0.7f)
-                            .clip(CircleShape)
-                            .background(Color(0xFF1E73E8))
-                    )
-                }
-                this@Row.AnimatedVisibility(
-                    visible = state.isVisible,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.pos_image),
-                        contentDescription = "POS System",
-                        modifier = Modifier.fillMaxSize(0.5f)
-                    )
-                }
-            }
-
-            // Right Login Form Section
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(Color(0xFFf5f5f5)),
-                contentAlignment = Alignment.Center
-            ) {
-                this@Row.AnimatedVisibility(
-                    visible = state.isVisible,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(32.dp).background(color = Color.White).fillMaxWidth(0.95f).fillMaxHeight(0.8f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Column(modifier = Modifier.padding(32.dp)) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                                Image(
-                                    painter = painterResource(Res.drawable.inventra_logo_and_text),
-                                    contentDescription = "Logo",
-                                    modifier = Modifier.fillMaxWidth(0.3f)
-                                )
-                            }
-                            Spacer(Modifier.height(40.dp))
-                            CustomText(
-                                "LOGIN",
-                                size = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            OutlinedTextField(
-                                value = state.userName,
-                                onValueChange = {
-                                    onAction(LoginAction.OnUserNameChange(it))
-                                },
-                                label = { Text("Username") },
-                                modifier = Modifier.fillMaxWidth(),
-
-                                trailingIcon = {
-                                    Icon(
-                                        painter = painterResource(Res.drawable.person),
-                                        contentDescription = "Username",
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                },
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            OutlinedTextField(
-                                value = state.password,
-                                onValueChange = {
-
-                                    onAction(LoginAction.OnPasswordChange(it))
-
-                                },
-                                visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                                trailingIcon = {
-                                    if(passwordVisible.value) {
-                                        Icon(
-                                            painter = painterResource(Res.drawable.visibility_off),
-                                            contentDescription = "Hide Password",
-                                            modifier = Modifier.size(24.dp).pointerHoverIcon(PointerIcon.Hand).clickable(
-                                                onClick = {
-                                                    passwordVisible.value = false
-                                                }
-                                            )
-                                        )
-                                    } else {
-                                        Icon(
-                                            painter = painterResource(Res.drawable.visibility),
-                                            contentDescription = "Show Password",
-                                            modifier = Modifier.size(24.dp).pointerHoverIcon(PointerIcon.Hand).clickable(
-                                                onClick = {
-                                                    passwordVisible.value = true
-                                                }
-                                            )
-                                        )
-                                    }
-                                },
-                                label = { Text("Password") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                state.errorMessage,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Red
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = {
-                                    onAction(LoginAction.OnLoginButtonClicked)
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF1E73E8
-                                    )
-                                ),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Login", color = Color.White)
-                            }
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                    try {
-
-                                            val firebaseUser = googleAuthProvider.signIn()
-                                            if (firebaseUser != null) {
-                                                Log.d(
-                                                    "Auth",
-                                                    "Compose: Signed in as: ${firebaseUser.displayName}, UID: ${firebaseUser.uid}"
-                                                )
-                                                // Show a Toast or navigate
-                                                // (Note: Toasts from composables need a Context, often passed down or accessed via LocalContext.current)
-                                                // Example using a simple Toast for demonstration, in a real app you'd navigate or show a SnackBar
-                                                // Toast.makeText(context, "Signed in!", Toast.LENGTH_SHORT).show()
-                                                //     loginViewModel.saveNewUser(firebaseUser)
-                                            } else {
-                                                Log.d(
-                                                    "Auth",
-                                                    "Compose: Google Sign-In failed or cancelled."
-                                                )
-                                                // Toast.makeText(context, "Sign-in failed!", Toast.LENGTH_SHORT).show()
-                                            }
-                                        } catch (e: Exception) {
-                                            Log.e("Auth", "Compose: Error during sign-in", e)
-                                            // Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Red
-                                ),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Login with Google", color = Color.White)
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-        AnimatedVisibility(
-            visible = state.isLoading,
-            enter = slideInHorizontally(),
-            exit = slideOutHorizontally()
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .background(Color.White),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            // ✨ 2. Apply the verticalScroll modifier
+            modifier = Modifier
+                .padding(32.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            ProgressDialog("Login in, Please wait...")
+            Image(
+                painter = painterResource(Res.drawable.inventra_logo_and_text),
+                contentDescription = "Logo",
+                modifier = Modifier.fillMaxWidth(0.4f)
+            )
+            Spacer(Modifier.height(40.dp))
+            Text(
+                "LOGIN",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = state.userName,
+                onValueChange = { onAction(LoginAction.OnUserNameChange(it)) },
+                label = { Text("Username") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.person),
+                        contentDescription = "Username",
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = state.password,
+                onValueChange = { onAction(LoginAction.OnPasswordChange(it)) },
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    val icon = if (passwordVisible.value) Res.drawable.visibility_off else Res.drawable.visibility
+                    val description = if (passwordVisible.value) "Hide Password" else "Show Password"
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = description,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                            .clickable { passwordVisible.value = !passwordVisible.value }
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            if (state.errorMessage.isNotBlank()) {
+                Text(
+                    state.errorMessage,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { onAction(LoginAction.OnLoginButtonClicked) },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E73E8)),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Login", color = Color.White)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { onAction(LoginAction.OnGoogleLoginClicked) },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Login with Google", color = Color.White)
+            }
         }
     }
 }

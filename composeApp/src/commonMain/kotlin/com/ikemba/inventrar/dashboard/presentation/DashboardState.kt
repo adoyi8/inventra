@@ -6,8 +6,8 @@ import com.ikemba.inventrar.cart.domain.CartItem
 import com.ikemba.inventrar.cart.domain.PostSalesModel
 import com.ikemba.inventrar.cart.presentation.ReceiptModel
 import com.ikemba.inventrar.dashboard.domain.Category
-import com.ikemba.inventrar.dashboard.domain.Item
 import com.ikemba.inventrar.dashboard.presentation.components.MenuItem
+import com.ikemba.inventrar.inventory.data.domain.model.Product
 import com.ikemba.inventrar.user.domain.User
 
 data class DashboardState (
@@ -19,8 +19,8 @@ data class DashboardState (
     var isVisible  : Boolean = false,
     val users: List<User> = emptyList(),
     val categories: List<Category> = emptyList(),
-    val allItems: List<Item> = emptyList(),
-    val visibleItems: List<Item> = emptyList(),
+    val allProducts: List<Product> = emptyList(),
+    val visibleProducts: List<Product> = emptyList(),
     var showConfirmLogout: Boolean = false,
     var showChangePasswordDialog: Boolean = false,
     var selectedMenuIndex : MutableTransitionState<Int> = MutableTransitionState(0),
@@ -42,5 +42,6 @@ data class DashboardState (
         MenuItem("Transaction History", imageUrl = "", ),
         MenuItem("Saved Sales", imageUrl = ""),
         MenuItem("Settings", imageUrl = "",)
-    )
+    ),
+    val showCartSheet: Boolean =false
     )

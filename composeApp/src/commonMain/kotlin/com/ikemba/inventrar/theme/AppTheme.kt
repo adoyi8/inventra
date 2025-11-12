@@ -7,7 +7,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-
+import androidx.compose.ui.unit.sp
 
 
 // --- Common Colors (if any, often standard black/white) ---
@@ -83,11 +83,20 @@ val SophisticatedInvitingDarkColors = darkColorScheme(
 )
 
 @Composable
-fun AppTheme(    darkTheme: Boolean = isSystemInDarkTheme(),content: @Composable () -> Unit,){
-    val colorScheme = if (darkTheme) {
+//fun AppTheme(    darkTheme: Boolean = isSystemInDarkTheme(),content: @Composable () -> Unit,){
+    fun AppTheme(    darkTheme: Boolean = true,content: @Composable () -> Unit,){
+
+        val colorScheme = if (darkTheme) {
         SophisticatedInvitingDarkColors // Or ModernChicDarkColors
     } else {
         SophisticatedInvitingLightColors // Or ModernChicLightColors
     }
     MaterialTheme(colorScheme = colorScheme, content= content)
+}
+
+object TextSize {
+    val titleMedium = 16.sp
+    val titleSmall = 14.sp
+    val bodyMedium = 14.sp
+    val bodySmall = 12.sp
 }

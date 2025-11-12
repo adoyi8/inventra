@@ -78,7 +78,8 @@ fun RoomListContainer(userViewModel: UserViewModel) {
             if(userState.value.business.isNotEmpty()) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                )
+                {
                     itemsIndexed(
                         userState.value.business,
                         key = { _, room -> room.organizationId }) { index, room ->
@@ -94,7 +95,7 @@ fun RoomListContainer(userViewModel: UserViewModel) {
                             exit = fadeOut(animationSpec = tween(300))
                         ) {
                             val onClick ={
-                                userViewModel.setSelectedBusiness(room)
+                              //  userViewModel.setSelectedBusiness(room)
                             }
                             RoomItem(room, onClick)
                         }

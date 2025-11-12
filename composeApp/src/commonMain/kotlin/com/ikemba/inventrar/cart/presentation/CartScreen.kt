@@ -1,7 +1,14 @@
 package com.ikemba.inventrar.cart.presentation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -36,105 +43,106 @@ import inventrar.composeapp.generated.resources.remove
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
+fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    Column(modifier = modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)){
+    Column(modifier = modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
 
-
-        Row(modifier = Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.SpaceBetween){
+        Row(modifier = Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.SpaceBetween) {
             Column() {
                 CustomText("Your cart", fontWeight = FontWeight.SemiBold)
-                CustomText(viewModel.state.value.reference)
+                CustomText(state.value.reference)
             }
-            Column(){
-                Button(onClick = {viewModel.holdOrder()}, shape = RoundedCornerShape(4.dp), colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)){
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable(
-                        onClick = {
-                            viewModel.holdOrder()
-                        }
-                    )){
-                        Image(painter = painterResource(Res.drawable.pause), contentDescription = "Put on Hold", modifier = Modifier.size(24.dp), colorFilter = ColorFilter.tint(Color.White))
-                        CustomText("Put on hold", color = Color.White)
-                    }
-                }
+            Column() {
+                CustomButton(
+                    onClick = { viewModel.holdOrder() },
+                    text = "Put on hold",
+                    backgroundColor = PrimaryColor,
+                    contentColor = Color.White
+                )
             }
         }
+
+        // --- Enhancement: Use LazyColumn for Cart Items ---
         Box(
             modifier = Modifier.fillMaxWidth().weight(9f).padding(7.dp)
-
         ) {
-            val stateVertical = rememberScrollState(0)
-
-
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .verticalScroll(stateVertical)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-        Column(modifier = Modifier.fillMaxWidth().heightIn(max = 3000.dp, min = 0.dp),) {
-            viewModel.state.collectAsStateWithLifecycle().value.cartItems.forEach { item ->
-                Row(
-                    Modifier.fillMaxWidth().padding(6.dp).clip(RoundedCornerShape(3.dp)).border(
-                        BorderStroke(1.dp, Color.Gray)
-                    ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    SmallItemImage(item.image, modifier = Modifier.padding(4.dp))
-                    CustomText(item.itemName!!, modifier = Modifier.weight(8f).padding(start = 5.dp))
-                    CustomText(currencyFormat( item.price), modifier = Modifier.weight(2.5f))
-                    Row(Modifier.weight(3.5f), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(
-                            onClick = { viewModel.subtractItemFromCart(item) },
+                items(state.value.cartItems, key = { it.itemId!! }) { item ->
+                    // Add animation for item add/remove
+                    this@Column.AnimatedVisibility(
+                        visible = true,
+                        enter = slideInHorizontally() + fadeIn(),
+                        exit = slideOutHorizontally() + fadeOut(),
+                        modifier = Modifier.animateItemPlacement()
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth().clip(RoundedCornerShape(3.dp)).border(
+                                BorderStroke(1.dp, Color.Gray)
+                            ),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                modifier = Modifier.size(15.dp),
-                                painter = painterResource(Res.drawable.remove),
-                                contentDescription = "",
-                                tint = PrimaryColor
-                            )
-                        }
-                        Row(modifier = Modifier.width(20.dp), horizontalArrangement = Arrangement.Center){
-                            CustomText(item.quantity.toString(), modifier = Modifier.fillMaxWidth() )
-                        }
 
-                        IconButton(
-                            onClick = { viewModel.addItemToCart(item) },
+                          //  SmallItemImage(item.image, modifier = Modifier.padding(4.dp))
+                            CustomText(item.itemName!!, modifier = Modifier.weight(8f).padding(start = 5.dp))
+                            CustomText(currencyFormat(item.price), modifier = Modifier.weight(2.5f))
+                            Row(Modifier.weight(3.5f), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(
+                                    onClick = { viewModel.subtractItemFromCart(item) },
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(15.dp),
+                                        painter = painterResource(Res.drawable.remove),
+                                        contentDescription = "",
+                                        tint = PrimaryColor
+                                    )
+                                }
+                                Row(modifier = Modifier.width(20.dp), horizontalArrangement = Arrangement.Center) {
+                                    CustomText(item.quantity.toString(), modifier = Modifier.fillMaxWidth())
+                                }
 
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(15.dp),
-                                painter = painterResource(Res.drawable.add),
-                                contentDescription = "",
-                                tint = PrimaryColor
-                            )
+                                IconButton(
+                                    onClick = { viewModel.addItemToCart(item) },
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(15.dp),
+                                        painter = painterResource(Res.drawable.add),
+                                        contentDescription = "",
+                                        tint = PrimaryColor
+                                    )
+                                }
+                            }
+                            CustomText(currencyFormat(item.getSubTotal()), modifier = Modifier.weight(3f))
+                            IconButton(onClick = {
+                                viewModel.removeItemFromCart(item)
+                            }, modifier = Modifier.weight(1f)) {
+                                Icon(Icons.Default.Clear, contentDescription = "", tint = Color.Red)
+                            }
                         }
                     }
-                    CustomText(currencyFormat(item.getSubTotal()), modifier = Modifier.weight(3f))
-                    IconButton(onClick = {
-                              viewModel.removeItemFromCart(item)
-                    }, modifier = Modifier.weight(1f)) {
-                        Icon(Icons.Default.Clear, contentDescription = "", tint = Color.Red)
-                    }
-
-
                 }
-                }
-        }
-}
+            }
 //            VerticalScrollbar(
 //                modifier = Modifier.align(Alignment.CenterEnd)
 //                    .fillMaxHeight(),
 //                adapter = rememberScrollbarAdapter(stateVertical)
 //            )
         }
-        Column(modifier = Modifier.fillMaxWidth().weight(4.5f).clip(
-            RoundedCornerShape(10.dp)).background(Color.LightGray)
-        ){
-            Column(modifier = Modifier.fillMaxWidth().weight(5f).background(Color(0xFFe4e4e4)).padding(10.dp)) {
+        // --- End Enhancement ---
+
+        Column(
+            modifier = Modifier.fillMaxWidth().weight(4.5f).clip(
+                RoundedCornerShape(10.dp)
+            )
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().weight(5f).padding(10.dp)) {
                 CustomText("Order Summary", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                HorizontalDivider(modifier= Modifier.padding(vertical = 4.dp).weight(1f))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp).weight(1f))
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp).weight(1f),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -159,7 +167,7 @@ fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     CustomText("TAX")
-                    CustomText(currencyFormat(state.value.cartItems.sumByDouble { it.price * it.quantity  * it.vatRate!! * 0.01}))
+                    CustomText(currencyFormat(state.value.cartItems.sumByDouble { it.price * it.quantity * it.vatRate!! * 0.01 }))
 
                 }
 
@@ -171,17 +179,21 @@ fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
             ) {
                 CustomText("Total", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 20.dp))
                 CustomText(
-                    currencyFormat(state.value.cartItems.sumByDouble { ((it.price * (it.vatRate!! * 0.01)) * it.quantity) + (it.price * it.quantity)}), fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 20.dp))
+                    currencyFormat(state.value.cartItems.sumByDouble { ((it.price * (it.vatRate!! * 0.01)) * it.quantity) + (it.price * it.quantity) }), fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
 
             }
         }
         HorizontalDivider(Modifier.padding(vertical = 12.dp))
-        Column(modifier = Modifier.fillMaxWidth().padding(10.dp).weight(4.5f).clip(
-            RoundedCornerShape(10.dp))){
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(10.dp).weight(4.5f).clip(
+                RoundedCornerShape(10.dp)
+            )
+        ) {
             Column(modifier = Modifier.fillMaxWidth().weight(4f).padding(horizontal = 10.dp)) {
                 CustomText("Payment Method", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Spacer( modifier = Modifier.weight(0.2f))
+                Spacer(modifier = Modifier.weight(0.2f))
                 Row(
                     modifier = Modifier.fillMaxWidth().weight(1f).clickable(
                         onClick = {
@@ -197,7 +209,7 @@ fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
                         painter = painterResource(Res.drawable.figma_card),
                         contentDescription = "MasterCard",
                         modifier = Modifier.size(24.dp),
-                       // colorFilter = ColorFilter.tint(Color.Cyan)
+                        // colorFilter = ColorFilter.tint(Color.Cyan)
                     )
                     CustomText("Paid with card")
 
@@ -216,7 +228,7 @@ fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
                         painter = painterResource(Res.drawable.figma_cash),
                         contentDescription = "MasterCard",
                         modifier = Modifier.size(24.dp),
-                       // colorFilter = ColorFilter.tint(Color.Green)
+                        // colorFilter = ColorFilter.tint(Color.Green)
                     )
                     CustomText("Paid with cash")
 
@@ -237,7 +249,7 @@ fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
                         painter = painterResource(Res.drawable.figma_transfer),
                         contentDescription = "Bank Transfer",
                         modifier = Modifier.size(24.dp),
-                       // colorFilter = ColorFilter.tint(CustomYellow)
+                        // colorFilter = ColorFilter.tint(CustomYellow)
                     )
                     CustomText("Paid with transfer")
 
@@ -245,10 +257,9 @@ fun CartScreen(viewModel: DashboardViewModel, modifier: Modifier = Modifier){
 
             }
 
-            Row(modifier= Modifier.fillMaxWidth().weight(1.2f), horizontalArrangement = Arrangement.Center){
-                CustomButton(onClick = {viewModel.clearCart() }, text = "Clear")
+            Row(modifier = Modifier.fillMaxWidth().weight(1.2f), horizontalArrangement = Arrangement.Center) {
+                CustomButton(onClick = { viewModel.clearCart() }, text = "Clear")
             }
         }
     }
-
 }

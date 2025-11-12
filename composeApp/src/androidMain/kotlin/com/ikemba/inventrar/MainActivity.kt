@@ -14,6 +14,8 @@ import com.ikemba.inventrar.app.App
 import com.ikemba.inventrar.auth.GoogleAuthLauncher
 import com.ikemba.inventrar.auth.GoogleAuthUiProvider
 import com.ikemba.inventrar.dashboard.utils.Util
+import com.ikemba.inventrar.splashScreen.presentation.SplashScreenRoot
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity(), GoogleAuthLauncher {
 
@@ -23,7 +25,6 @@ class MainActivity : ComponentActivity(), GoogleAuthLauncher {
 
     // The ActivityResultLauncher
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        println("ameen "+ result.data?.extras)
         googleAuthUiProvider.handleSignInIntentResult(result.data)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity(), GoogleAuthLauncher {
 
 
         setContent {
-            App(googleAuthUiProvider = googleAuthUiProvider)
+            SplashScreenRoot(googleAuthUiProvider = googleAuthUiProvider, userViewModel = koinViewModel(), businessViewModel = koinViewModel())
         }
     }
 

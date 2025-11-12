@@ -48,23 +48,19 @@ class TransactionHistoryViewModel(
             _state.update {
                 it.copy(showProgressDialog = MutableTransitionState(true))
             }
-            println("called access token "+ Util.accessToken)
             transactionHistoryRepository.getTransactionHistory(Util.accessToken, paginationRequest)
                 .onSuccess { transactionHistoryResponse ->
-                    println("Sour pie 1")
                     if(transactionHistoryResponse.responseCode == 0){
                         val history = transactionHistoryResponse.toTransactionHistory()
+                        println("angel 3 "+ history.orders?.size)
                         _state.update {
                             it.copy(transactionHistory = history, showProgressDialog = MutableTransitionState(false), page = history.page, limit = history.limit, totalPages = history.totalPages, totalOrders = history.totalOrders)
                         }
                     }
                     else{
-                        println("Sour pie 3")
                         if(transactionHistoryResponse.responseMessage!!.contains(Util.EXPIRED_TOKEN_MESSAGE, true)) {
-                            println("Sour")
                             NavigationViewModel.navController!!.navigate(Route.Login)
                         }
-                        println("Sour pie 5")
                         _state.update {
                             it.copy(showProgressDialog = MutableTransitionState(false), transactionHistory = TransactionHistory(), backUpHistory = TransactionHistory())
                         }
@@ -122,7 +118,6 @@ class TransactionHistoryViewModel(
             try {
 
                         cartRepository.getOrderReceipt(
-                            Util.accessToken,
                             VoidOrderRequest(reference)
                         ).onSuccess { receiptResponseDto ->
                             hideAllDialogs()

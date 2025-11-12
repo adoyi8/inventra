@@ -29,8 +29,7 @@ data class User(
     var branchName: String? = null,
     var defaultTax: String? = null,
     var accessToken: String? = null,
-    var organizationId: String? = null,
-    var organizationName: String? = null,
+    var businessId: String? = null,
 ){
     fun getFullName(): String{
         return "$firstname $lastname"

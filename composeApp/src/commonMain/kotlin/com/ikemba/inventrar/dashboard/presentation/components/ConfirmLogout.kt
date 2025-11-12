@@ -13,8 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ikemba.inventrar.core.presentation.components.CustomButton
 import com.ikemba.inventrar.core.presentation.components.CustomText
 import com.ikemba.inventrar.login.presentation.UserViewModel
 
@@ -27,22 +29,17 @@ fun ConfirmLogout(viewModel: UserViewModel) {
         content = {
             AlertDialog(
                 onDismissRequest = {},
-                title = { Text("Confirm Exit") },
+                title = { CustomText("Confirm Exit") },
                 confirmButton = {
-                    Button(onClick =
+                    CustomButton(onClick =
                     {
                          viewModel.logout()
-                    }){
-        CustomText("Yes")
-                    }
+                    }, text = "Yes")
                 },
                 dismissButton = {
-                    Button(onClick = {
+                    CustomButton(onClick = {
                         viewModel.hideShowConfirmLogout()
-                    }){
-
-                        Text("No")
-                    }
+                    }, text = "No")
                     //    showConfirmExitApplication = false
                 },
                 text = {

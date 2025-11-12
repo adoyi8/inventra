@@ -1,6 +1,8 @@
 package com.ikemba.inventrar.user.data.repository
 
 import androidx.sqlite.SQLiteException
+import com.google.firebase.firestore.FirebaseFirestore
+import com.ikemba.inventrar.business.data.domain.model.AppUser
 import com.ikemba.inventrar.core.data.dto.ResponseDto
 import com.ikemba.inventrar.core.domain.DataError
 import com.ikemba.inventrar.core.domain.EmptyResult
@@ -15,10 +17,12 @@ import com.ikemba.inventrar.user.domain.User
 import com.ikemba.inventrar.user.domain.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 
 class DefaultUserRepository(
     private val remoteUserDataSource: RemoteUserDataSource,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val firestore: FirebaseFirestore
 ): UserRepository {
 
     override suspend fun login(username: String, password: String): Result<UserLoginResponseDto, DataError> {
@@ -30,11 +34,7 @@ class DefaultUserRepository(
                 .map {
                     it
                 }
-
         return response
-        //} else {
-        //  Result.Success(localResult.description)
-       // }
     }
 
     override suspend fun changePassword(
@@ -72,6 +72,26 @@ class DefaultUserRepository(
 
     override suspend fun deleteAllUsers(){
         userDao.deleteAllUsers()
+    }
+    override suspend fun checkAndCreateUserInFirestore(firebaseUser: dev.gitlive.firebase.auth.FirebaseUser?): kotlin.Result<Unit> {
+        return try {
+            val userDocRef = firestore.collection("users").document(firebaseUser!!.uid)
+            val document = userDocRef.get().await()
+
+            if (!document.exists()) {
+                // User does not exist, so create them
+                val newUser = AppUser(
+                    userId = firebaseUser.uid,
+                    email = firebaseUser.email ?: "",
+                    fullName = firebaseUser.displayName ?: "No Name"
+                )
+                userDocRef.set(newUser).await()
+            }
+            // If the document exists, we do nothing and just return success.
+            kotlin.Result.success(Unit)
+        } catch (e: Exception) {
+            kotlin.Result.failure(e)
+        }
     }
 
 }

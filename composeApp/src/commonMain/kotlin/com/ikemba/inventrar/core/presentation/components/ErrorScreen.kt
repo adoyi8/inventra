@@ -18,7 +18,7 @@ fun CoreErrorScreen(visibleState: MutableTransitionState<Boolean>, errorMessage:
     AnimatedVisibility(visibleState = visibleState) {
         AlertDialog(
             onDismissRequest = {visibleState.targetState = false},
-            title = { Text("Info!") },
+            title = { CustomText("Info!", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
             confirmButton = {
                 CustomButton(
                     {visibleState.targetState = false},

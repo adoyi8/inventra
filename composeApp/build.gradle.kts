@@ -20,7 +20,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     jvm("desktop")
 
     room {
@@ -28,7 +28,7 @@ kotlin {
     }
     sourceSets {
         val desktopMain by getting
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -36,21 +36,33 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
             implementation(libs.ktor.client.okhttp)
-            implementation("com.google.android.gms:play-services-auth:21.2.0")
+          //  implementation("com.google.android.gms:play-services-auth:21.2.0")
+            // Android Credential Manager
+            implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+            implementation("com.google.android.gms:play-services-auth:21.3.0") // Use the newer version
+            implementation("com.google.android.gms:play-services-base:18.4.0")
+            implementation("androidx.credentials:credentials:1.2.2")
+            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
         }
         commonMain.dependencies {
+            // FIX 1: Use the Compose BOM to enforce consistent versions for all Compose dependencies
+            // This manages versions for dependencies like compose.ui, compose.foundation, and the lifecycle libraries
+            implementation(platform(libs.androidx.compose.bom.get()))
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
+
+            // Removed explicit androidx.lifecycle dependencies (e.g., lifecycle-runtime-compose:2.7.0)
+            // as they are now managed by the BOM to prevent conflicts.
+            implementation(libs.androidx.lifecycle.viewmodel) // Retained but version is BOM-managed
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.androidx.lifecycle.runtime.compose) // Retained but version is BOM-managed
+
             implementation("org.usb4java:usb4java:1.3.0")
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.room.runtime)
@@ -65,20 +77,21 @@ kotlin {
             implementation("org.apache.commons:commons-text:1.10.0")
 
 
-            implementation("dev.gitlive:firebase-auth:1.10.3")
-            // Android Credential Manager
-            implementation("androidx.credentials:credentials:1.2.2") // Use the latest stable version
+            // FIX 2: Upgraded Multiplatform Firebase Auth to a modern version (2.3.0)
+            // The older version 1.10.3 was a likely cause of the NoSuchMethodError conflict.
+            implementation("dev.gitlive:firebase-auth:2.3.0")
+            implementation("dev.gitlive:firebase-firestore:2.3.0")
 
-            // Helper library for Google Sign-In with Credential Manager
-            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
-            implementation("com.google.android.gms:play-services-auth:21.3.0")
-            implementation ("com.google.android.gms:play-services-base:18.4.0")
-            implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
+            // Removed conflicting dependency, relying on GitLive KMP implementation now.
+            // implementation("com.google.firebase:firebase-admin:9.2.0")
+           // implementation("dev.gitlive:firebase-admin:2.3.0")
+            //implementation("dev.gitlive:firebase-java-sdk:0.6.2")
         }
         dependencies {
             ksp(libs.androidx.room.compiler)
@@ -130,7 +143,7 @@ compose.desktop {
         mainClass = "com.ikemba.inventrar.MainKt"
 
         // Set the application display name here
-      //  name = "Inventrar" // This is the correct property for the application's human-readable name
+        //  name = "Inventrar" // This is the correct property for the application's human-readable name
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
@@ -157,7 +170,7 @@ compose.desktop {
 
                 // To add an entry to the Start Menu
                 menu = true
-                // The menu entry will also typically use 'application.name'
+                // The menu entry will also typically use the 'application.name'
                 menuGroup = "Inventrar Applications" // Optional: specify a menu group
 
                 // For Windows, the 'application.name' is generally used as the product name.
@@ -200,4 +213,3 @@ compose.desktop {
     }
     // The problematic line "name = "Inventrar"" has been removed from here.
 }
-

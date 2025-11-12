@@ -14,5 +14,7 @@ interface UserRepository {
     fun getAllUsers(): Flow<List<User>>
     suspend fun saveUserInLocalDb(user: User): EmptyResult<DataError.Local>
     suspend fun deleteAllUsers()
+    suspend fun checkAndCreateUserInFirestore(firebaseUser: dev.gitlive.firebase.auth.FirebaseUser?): kotlin.Result<Unit>
+
 
 }

@@ -6,15 +6,14 @@ import com.ikemba.inventrar.dashboard.data.database.ItemEntity
 import com.ikemba.inventrar.dashboard.data.dto.CategoryDto
 import com.ikemba.inventrar.dashboard.data.dto.ItemDto
 import com.ikemba.inventrar.dashboard.domain.Category
-import com.ikemba.inventrar.dashboard.domain.Item
+import com.ikemba.inventrar.inventory.data.domain.model.Product
 
 
-
-fun Item.toItemEntity(): ItemEntity {
+fun Product.toItemEntity(): ItemEntity {
     return ItemEntity(
         id = id,
         name = name,
-        image = image,
+        image = null,
         unitPrice = unitPrice,
         categoryId = categoryId,
         discount = discount?.toDouble(),
@@ -22,11 +21,11 @@ fun Item.toItemEntity(): ItemEntity {
         sku = sku
     )
 }
-fun ItemEntity.toItem(): Item{
-    return Item(
+fun ItemEntity.toItem(): Product{
+    return Product(
         id = id,
         name = name,
-        image = image,
+       // image = image,
         unitPrice = unitPrice,
         categoryId = categoryId,
         discount = discount?.toDouble(),
@@ -34,11 +33,11 @@ fun ItemEntity.toItem(): Item{
         sku = sku
     )
 }
-fun ItemDto.toItem(): Item{
-    return Item(
+fun ItemDto.toItem(): Product{
+    return Product(
         id = id,
         name = name,
-        image = image,
+       /// image = image,
         unitPrice = unitPrice.toDouble(),
         categoryId = categoryId,
         discount = discount?.toDouble(),

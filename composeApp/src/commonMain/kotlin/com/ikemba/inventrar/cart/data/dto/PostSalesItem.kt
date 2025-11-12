@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PostSalesItem(
-    var product_id :Int,
+    var product_id :String,
     var product_name :String?,
     var qty: String,
     var subtotal: Double,

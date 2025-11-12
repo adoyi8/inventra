@@ -47,7 +47,7 @@ class KtorRemoteUserDataSource(
     override suspend fun login(username: String, password: String): Result<UserLoginResponseDto, DataError.Remote> {
 
         val loginBody =LoginRequest(emailAddress = username, password=Base64.encode(password.toByteArray()),ipAddress ="081343902049", deviceUsedToLogin = "ssds", countryOfLogin = "Nigeria", platformId = "1223")
-        println("Philo $loginBody")
+
         val response = safeCall<UserLoginResponseDto> {
             httpClient.post(
                 urlString = "${USER_SERVICE_URL}/employee-login"
@@ -56,7 +56,6 @@ class KtorRemoteUserDataSource(
                 setBody(loginBody)
             }
         }
-        println("Ars "+ response.toString())
        return response
         }
     override suspend fun changePassword(oldPassword: String, newPassword: String, confirmPassword: String): Result<ResponseDto, DataError.Remote> {
@@ -71,7 +70,7 @@ class KtorRemoteUserDataSource(
                 }
             }
         }
-        println("Ars "+ response.toString())
+
         return response
     }
 
