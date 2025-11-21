@@ -2,17 +2,13 @@ package com.ikemba.inventrar.business.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Entity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.ikemba.inventrar.business.data.database.Business
 import com.ikemba.inventrar.business.data.database.BusinessDao
-import com.ikemba.inventrar.business.data.domain.model.AppUser
 import com.ikemba.inventrar.business.data.domain.useCase.CreateBusinessUseCase
 import com.ikemba.inventrar.business.data.domain.useCase.GetBusinessesForUserUseCase
 import com.ikemba.inventrar.user.data.database.UserDao
-import com.ikemba.inventrar.user.data.database.UserEntity
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -41,17 +37,19 @@ class BusinessListViewModel(
         loadBusinesses()
     }
 
-    fun loadBusinesses() {
+    fun loadBusinesses(id: String? = FirebaseAuth.getInstance().currentUser?.uid) {
+        println("amirah "+currentUser?.uid)
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            currentUser?.let {
-                getBusinessesForUserUseCase(it.uid)
+            id?.let {
+                getBusinessesForUserUseCase(it)
                     .onSuccess { businesses ->
                         _uiState.update {
                             it.copy(isLoading = false, businesses = businesses, error = null)
                         }
                     }
                     .onFailure { error ->
+                        println("bikini "+ error.message)
                         _uiState.update {
                             it.copy(isLoading = false, error = "Failed to load businesses.")
                         }
@@ -63,6 +61,7 @@ class BusinessListViewModel(
     fun createBusiness(name: String) {
         viewModelScope.launch {
             currentUser?.let {
+                println("shiva 1")
                 createBusinessUseCase(name, it)
                     .onSuccess {
                         loadBusinesses() // Refresh the list after creation

@@ -17,6 +17,7 @@ import com.ikemba.inventrar.core.domain.DataError
 import com.ikemba.inventrar.core.domain.EmptyResult
 import com.ikemba.inventrar.core.domain.Result
 import com.ikemba.inventrar.heldOrder.data.dto.VoidOrderRequest
+import com.ikemba.inventrar.utils.StringUtil.BUSINESS_COLLECTION
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
@@ -30,6 +31,7 @@ class DefaultCartRepository(
     override suspend fun postCartSales(postSalesRequest: PostSalesRequest):Result<ResponseDto, DataError.Remote> {
         return try {
             val ref = postSalesRequest.reference ?: System.currentTimeMillis().toString()
+            val busRef = firestore.collection(BUSINESS_COLLECTION).document(postSalesRequest.businessId)
             println("barry 1")
             val data = hashMapOf(
                 "reference" to ref,
@@ -39,10 +41,11 @@ class DefaultCartRepository(
                 "grandTotal" to (postSalesRequest.grandTotal ?: 0.0),
                 "payment_method" to (postSalesRequest.payment_method ?: "cash"),
                 "is_held" to postSalesRequest.is_held,
-                "createdAt" to FieldValue.serverTimestamp()
+                "createdAt" to FieldValue.serverTimestamp(),
+                "createdBy" to postSalesRequest.userId
             )
             println("barry 2")
-            firestore.collection("sales").document(ref).set(data).await()
+            busRef.collection("sales").document(ref).set(data).await()
             println("barry 3")
             Result.Success(ResponseDto(responseCode = 0, responseMessage = "OK"))
         } catch (e: Exception) {
@@ -55,8 +58,9 @@ class DefaultCartRepository(
         voidOrderRequest: VoidOrderRequest
     ): Result<ReceiptResponseDto?, DataError> {
         return try {
-            println("doku "+ voidOrderRequest.reference)
-            val doc = firestore.collection("sales").document(voidOrderRequest.reference).get().await()
+
+            val busRef = firestore.collection(BUSINESS_COLLECTION).document(voidOrderRequest.businessId)
+            val doc = busRef.collection("sales").document(voidOrderRequest.reference).get().await()
             if (!doc.exists()) {
                 println("aminu no")
                 return Result.Success(

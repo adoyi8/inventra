@@ -33,15 +33,15 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -49,13 +49,18 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.ikemba.inventrar.admin.TwoStepMenuScreen
+import com.ikemba.inventrar.admin.data.domain.model.SystemPermissions
 import com.ikemba.inventrar.admin.presentation.AdminViewModel
 import com.ikemba.inventrar.admin.presentation.CreateInventoryForm
-import com.ikemba.inventrar.admin.presentation.rolePermission.RoleManagementScreen
+import com.ikemba.inventrar.admin.presentation.branch.BranchManagementScreen
 import com.ikemba.inventrar.admin.presentation.rolePermission.CreateEditRoleScreen
+import com.ikemba.inventrar.admin.presentation.rolePermission.RoleManagementScreen
 import com.ikemba.inventrar.admin.presentation.rolePermission.RolePermissionViewModel
-import com.ikemba.inventrar.admin.presentation.staff.StaffListScreen
 import com.ikemba.inventrar.admin.presentation.staff.StaffDetailsScreen
+import com.ikemba.inventrar.admin.presentation.staff.StaffDetailsViewModel
+import com.ikemba.inventrar.admin.presentation.staff.StaffListScreen
+import com.ikemba.inventrar.admin.presentation.staff.StaffListViewModel
+import com.ikemba.inventrar.audit.presentation.AuditTrailScreen
 import com.ikemba.inventrar.auth.GoogleAuthUiProvider
 import com.ikemba.inventrar.business.presentation.AddStaffViewModel
 import com.ikemba.inventrar.business.presentation.BusinessListViewModel
@@ -64,18 +69,24 @@ import com.ikemba.inventrar.core.presentation.NavigationViewModel
 import com.ikemba.inventrar.core.presentation.components.CustomText
 import com.ikemba.inventrar.dashboard.presentation.DashboardViewModel
 import com.ikemba.inventrar.dashboard.presentation.components.ConfirmLogout
+import com.ikemba.inventrar.dashboard.utils.Util.APP_NAME
 import com.ikemba.inventrar.department.CreateEditDepartmentScreen
 import com.ikemba.inventrar.department.DepartmentListScreen
 import com.ikemba.inventrar.department.DepartmentViewModel
 import com.ikemba.inventrar.dropdowndata.presentation.DropDownSettingsViewModel
+import com.ikemba.inventrar.expense.presentation.ExpenseScreen
+import com.ikemba.inventrar.expense.presentation.ExpenseViewModel
 import com.ikemba.inventrar.inventory.presentation.CategoryFormScreen
 import com.ikemba.inventrar.inventory.presentation.CategoryFormViewModel
 import com.ikemba.inventrar.inventory.presentation.CategoryListScreen
 import com.ikemba.inventrar.inventory.presentation.CategoryListViewModel
+import com.ikemba.inventrar.inventory.presentation.LocationListScreen
 import com.ikemba.inventrar.inventory.presentation.LocationListViewModel
 import com.ikemba.inventrar.inventory.presentation.ProductFormScreen
 import com.ikemba.inventrar.inventory.presentation.ProductFormViewModel
+import com.ikemba.inventrar.inventory.presentation.ProductListScreen
 import com.ikemba.inventrar.inventory.presentation.ProductListViewModel
+import com.ikemba.inventrar.inventory.presentation.StockTransferScreen
 import com.ikemba.inventrar.login.presentation.UserViewModel
 import com.ikemba.inventrar.theme.AppTheme
 import com.ikemba.inventrar.transactionHistory.presentation.TransactionHistoryViewModel
@@ -83,9 +94,7 @@ import com.ikemba.inventrar.transactionHistory.presentation.TransactionScreen
 import com.ikemba.inventrar.user.presentation.ProfileScreen
 import inventrar.composeapp.generated.resources.Res
 import inventrar.composeapp.generated.resources.admin_panel
-import inventrar.composeapp.generated.resources.person
 import inventrar.composeapp.generated.resources.receipt
-import inventrar.composeapp.generated.resources.scanner
 import inventrar.composeapp.generated.resources.shopping_basket
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -102,7 +111,8 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
     val userState by userViewModel.state.collectAsState()
     val navController = rememberNavController()
     val rolePermissionViewModel: RolePermissionViewModel = koinViewModel()
-    val title = remember { mutableStateOf("Hello") }
+    val title = remember { mutableStateOf(APP_NAME) }
+    var parentDestination : MutableState<Route> = remember {mutableStateOf(Route.BusinessListScreenRoute)}
 
     LaunchedEffect(true){
         NavigationViewModel.businessNavController = navController
@@ -127,8 +137,9 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                             size = 35.sp
                         )
                         Spacer(modifier = Modifier.height(24.dp))
+                        if(userState.permissions.contains(SystemPermissions.SYSTEM_ADMIN.id)){
                         NavigationDrawerItem(
-                            label = { CustomText("Manage") },
+                            label = { CustomText("Admin Panel") },
                             selected = false,
                             onClick = {
                                 scope.launch {
@@ -136,16 +147,37 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                     navController.navigate(Route.AdminMenuRoute)
                                 }},
                             colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent)
-                        )
-                        NavigationDrawerItem(
-                            label = { CustomText("Sales") },
-                            selected = false,
-                            onClick = {
-                                scope.launch {
-                                    drawerState.close()
-                                navController.navigate(Route.POSScreen) }},
-                            colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent)
-                        )
+                        )}
+                        if(userState.permissions.contains(SystemPermissions.PROCESS_SALES.id)) {
+                            NavigationDrawerItem(
+                                label = { CustomText("Sales") },
+                                selected = false,
+                                onClick = {
+                                    scope.launch {
+                                        drawerState.close()
+                                        navController.navigate(Route.POSScreen)
+                                    }
+                                },
+                                colors = NavigationDrawerItemDefaults.colors(
+                                    unselectedContainerColor = Color.Transparent
+                                )
+                            )
+                        }
+                        if(userState.permissions.contains(SystemPermissions.ADD_EXPENSES.id)) {
+                            NavigationDrawerItem(
+                                label = { CustomText("Expenses") },
+                                selected = false,
+                                onClick = {
+                                    scope.launch {
+                                        drawerState.close()
+                                        navController.navigate(Route.ExpensesScreen)
+                                    }
+                                },
+                                colors = NavigationDrawerItemDefaults.colors(
+                                    unselectedContainerColor = Color.Transparent
+                                )
+                            )
+                        }
 
                         Divider(modifier = Modifier.padding(vertical = 16.dp))
                         NavigationDrawerItem(
@@ -209,6 +241,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ) {
                         // M3: BottomNavigationItem is now NavigationBarItem
+                        if(userState.permissions.contains(SystemPermissions.SYSTEM_ADMIN.id)){
                         NavigationBarItem(
                             icon = {
                                 Icon(
@@ -218,24 +251,26 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                 )
                             },
                             label = { CustomText("Admin Panel") },
-                            selected = navController.currentDestination?.equals(Route.AdminMenuRoute)
-                                ?: false,
+                            selected = parentDestination.value == Route.AdminMenuRoute,
                             onClick = { navController.navigate(Route.AdminMenuRoute) }
-                        )
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    painterResource(Res.drawable.shopping_basket),
-                                    contentDescription = "Sales",
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            },
-                            label = { CustomText("Sales") },
-                            selected = navController.currentDestination?.equals(Route.POSScreen)
-                                ?: false,
-                            onClick = { navController.navigate(Route.POSScreen) }
-                        )
-                        NavigationBarItem(
+                        )}
+                        if(userState.permissions.contains(SystemPermissions.PROCESS_SALES.id)) {
+
+                            NavigationBarItem(
+                                icon = {
+                                    Icon(
+                                        painterResource(Res.drawable.shopping_basket),
+                                        contentDescription = "Sales",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                },
+                                label = { CustomText("Sales") },
+                                selected = parentDestination.value == Route.POSScreen,
+                                onClick = { navController.navigate(Route.POSScreen) }
+                            )
+                        }
+                        if(userState.permissions.contains(SystemPermissions.PROCESS_SALES.id)) {
+                            NavigationBarItem(
                             icon = {
                                 Icon(
                                     painterResource(Res.drawable.receipt),
@@ -244,11 +279,10 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                 )
                             },
                             label = { CustomText("Sales Report") },
-                            selected = navController.currentDestination?.equals(Route.TransactionHistoryScreen)
-                                ?: false,
+                            selected = parentDestination.value == Route.TransactionHistoryScreen,
                             onClick = { navController.navigate(Route.TransactionHistoryScreen) }
                         )
-                    }
+                    }}
                 },
 
 
@@ -262,6 +296,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                 )
                 {
 
+
                     navigation<Route.BookGraph>(
                         startDestination = Route.POSScreen
                     ) {
@@ -271,14 +306,37 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                             popEnterTransition = { slideInHorizontally() }
                         ) {
                             title.value = "Sales"
-                            POScreen(viewModel = koinViewModel<DashboardViewModel>(), userViewModel = userViewModel)
+                            parentDestination.value = Route.POSScreen
+                            POScreen(viewModel = koinViewModel<DashboardViewModel>(
+                                parameters = { parametersOf(userState.currentUser?.businessId) }
+                            ), userViewModel = userViewModel)
+                        }
+                        composable<Route.ExpensesScreen>(
+                            exitTransition = { slideOutHorizontally() },
+                            popEnterTransition = { slideInHorizontally() }
+                        ) {
+                            title.value = "Expenses"
+                            parentDestination.value = Route.ExpensesScreen
+                            ExpenseScreen(
+                                viewModel = koinViewModel<ExpenseViewModel>(
+                                parameters = {
+                                    parametersOf(
+                                        userState.currentUser?.businessId,
+                                    )
+                                }
+                            ),
+                                staffId = userState.currentUser?.staffNo?:"",
+                                userViewModel = userViewModel)
                         }
                         composable<Route.TransactionHistoryScreen>(
                             exitTransition = { slideOutHorizontally() },
                             popEnterTransition = { slideInHorizontally() }
                         ) {
                             title.value = "Sales Report"
-                            TransactionScreen(viewModel = koinViewModel<TransactionHistoryViewModel>())
+                            parentDestination.value = Route.TransactionHistoryScreen
+                            TransactionScreen(viewModel = koinViewModel<TransactionHistoryViewModel>(
+                                parameters = { parametersOf(userState.currentUser?.businessId) },
+                            ), userViewModel = userViewModel)
                         }
 
                         composable<Route.UserProfileRoute>(
@@ -286,6 +344,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                             popEnterTransition = { slideInHorizontally() }
                         ) {
                             title.value = "Profile"
+                            parentDestination.value = Route.UserProfileRoute
                             ProfileScreen()
                         }
                         composable<Route.AdminMenuRoute>(
@@ -293,6 +352,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                             popEnterTransition = { slideInHorizontally() }
                         ) {
                             title.value = "Admin Panel"
+                            parentDestination.value = Route.AdminMenuRoute
                             TwoStepMenuScreen()
                         }
                         composable<Route.BranchManagementRoute>(
@@ -300,7 +360,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                             popEnterTransition = { slideInHorizontally() }
                         ) {
                             title.value = "Branch"
-                            com.ikemba.inventrar.admin.presentation.branch.BranchManagementScreen()
+                            BranchManagementScreen()
                         }
                         composable<Route.ProductListRoute>(
                             exitTransition = { slideOutHorizontally() },
@@ -311,7 +371,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                 parameters = { parametersOf(userState.currentUser?.businessId) }
                             )
                             title.value = "Products"
-                            com.ikemba.inventrar.inventory.presentation.ProductListScreen(
+                            ProductListScreen(
                                 viewModel = productListViewModel,
                                 onNavigateToAddProduct = {
                                     // Navigate to the combined form screen for Add (productId = null)
@@ -404,7 +464,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                 val locationListViewModel: LocationListViewModel = koinViewModel(
                                     parameters = { parametersOf(userState.currentUser?.businessId) }
                                 )
-                                com.ikemba.inventrar.inventory.presentation.LocationListScreen(
+                                LocationListScreen(
                                     viewModel = locationListViewModel,
                                     onNavigateToAddLocation = { /* Navigate to add location */ },
                                     onNavigateToLocationDetail = { /* Navigate to location detail */ }
@@ -455,7 +515,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                 exitTransition = { slideOutHorizontally() },
                                 popEnterTransition = { slideInHorizontally() }
                             ) {
-                                com.ikemba.inventrar.inventory.presentation.StockTransferScreen(
+                                StockTransferScreen(
                                     onTransfer = { /* Process transfer */ },
                                     onCancel = { NavigationViewModel.businessNavController?.popBackStack() }
                                 )
@@ -465,7 +525,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                 exitTransition = { slideOutHorizontally() },
                                 popEnterTransition = { slideInHorizontally() }
                             ) {
-                                com.ikemba.inventrar.audit.presentation.AuditTrailScreen()
+                                AuditTrailScreen()
                             }
                             composable<Route.DepartmentListRoute>(
                                 exitTransition = { slideOutHorizontally() },
@@ -552,7 +612,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
                                 exitTransition = { slideOutHorizontally() },
                                 popEnterTransition = { slideInHorizontally() }
                             ) {
-                                val staffListViewModel: com.ikemba.inventrar.admin.presentation.staff.StaffListViewModel =
+                                val staffListViewModel: StaffListViewModel =
                                     koinViewModel(
                                         parameters = { parametersOf(userState.currentUser?.businessId) }
                                     )
@@ -572,7 +632,7 @@ fun BusinessNavigationGraph(dashboardViewModel: MutableState<DashboardViewModel?
 
                             composable<Route.StaffDetailRoute> {
                                 val args = it.toRoute<Route.StaffDetailRoute>()
-                                val vm: com.ikemba.inventrar.admin.presentation.staff.StaffDetailsViewModel =
+                                val vm: StaffDetailsViewModel =
                                     koinViewModel(
                                         parameters = { parametersOf(args.staffId) }
                                     )

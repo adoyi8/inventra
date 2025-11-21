@@ -59,6 +59,7 @@ fun User.toUserEntity(): UserEntity {
         accessToken = accessToken,
         userId = userId,
         organizationId = businessId,
+        permissions = permissions
     )
 }
 
@@ -91,5 +92,6 @@ fun UserEntity.toUser(): User {
         accessToken = accessToken,
         userId = userId,
         businessId = organizationId,
+        permissions = permissions
     )
 }

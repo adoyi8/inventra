@@ -16,4 +16,6 @@ data class PostSalesRequestEntity(
     var syncedStatus: Boolean = false,
     @PrimaryKey(autoGenerate = false)
     var reference: String,
+    val businessId: String,
+    val userId: String
 )

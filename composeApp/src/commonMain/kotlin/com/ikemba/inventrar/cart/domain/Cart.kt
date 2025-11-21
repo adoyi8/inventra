@@ -10,6 +10,8 @@ data class Cart(
     val subtotal: Double? = null,
     val shippingCost: Double? = null,
     val tax: Double?    = null,
+    val businessId: String,
+    val userId: String
 
     ){
 

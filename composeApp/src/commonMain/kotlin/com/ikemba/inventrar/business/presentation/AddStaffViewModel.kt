@@ -2,6 +2,7 @@ package com.ikemba.inventrar.business.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ikemba.inventrar.admin.data.domain.model.Role
 import com.ikemba.inventrar.admin.data.domain.useCase.GetAllRolesUseCase
 import com.ikemba.inventrar.admin.data.domain.useCase.GetDepartmentsUseCase
 import com.ikemba.inventrar.business.data.domain.model.AppUser
@@ -22,7 +23,7 @@ data class AddStaffUiState(
     val foundUser: AppUser? = null,
     val infoMessage: String? = null,
     val error: String? = null,
-    val roles: List<String> = emptyList(),
+    val roles: List<Role> = emptyList(),
     val selectedRole: String = "",
     val selectedDepartmentId: String = "",
     val departments: List<Pair<String, String>> = emptyList(), // id to name
@@ -56,7 +57,7 @@ class AddStaffViewModel(
                 _uiState.update {
                     it.copy(
                         departments = departments.map { dept -> dept.id to dept.name },
-                        roles = roles.map { role -> role.name } // Map to just names, as per your original UI logic
+                        roles = roles// Map to just names, as per your original UI logic
                         // branches = branches.map { branch -> branch.id to branch.name }
                     )
                 }
@@ -75,8 +76,8 @@ class AddStaffViewModel(
         }
     }
 
-    fun onRoleSelected(role: String) {
-        _uiState.update { it.copy(selectedRole = role) }
+    fun onRoleSelected(role: Role) {
+        _uiState.update { it.copy(selectedRole = role.id) }
     }
 
     fun onDepartmentSelected(departmentId: String) {

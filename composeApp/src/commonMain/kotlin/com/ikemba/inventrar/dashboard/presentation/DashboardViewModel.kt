@@ -4,6 +4,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.ikemba.inventrar.app.Route
 import com.ikemba.inventrar.cart.data.mappers.toPostSalesModel
 import com.ikemba.inventrar.cart.data.mappers.toPostSalesRequest
@@ -45,6 +46,7 @@ class DashboardViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
+    private val businessId: String,
 ) : ViewModel()
 {
     private val _state = MutableStateFlow(DashboardState())
@@ -53,6 +55,7 @@ class DashboardViewModel(
     private var observeVisibleItem: Job? = null
     private var observeAllItemsJob: Job? = null
     private var observeSavedSalesJob: Job? = null
+    private val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
 
     val state = _state.asStateFlow()
@@ -158,7 +161,7 @@ class DashboardViewModel(
 
     fun getProducts() {
         viewModelScope.launch {
-            productRepository.getProducts(Util.accessToken)
+            productRepository.getProducts(businessId)
                 .onSuccess { productResponse ->
                     if (productResponse.responseCode == 0) {
                         productRepository.clear()
@@ -441,7 +444,7 @@ class DashboardViewModel(
                     it.copy(showPostSalesDialog = MutableTransitionState(true), showCartSheet = false)
                 }
                 println("kdh 2")
-                val cart = Cart(items = state.value.cartItems)
+                val cart = Cart(items = state.value.cartItems, businessId = businessId, userId = userId)
                 println("kdh 3")
                 cart.paymentMethod = state.value.paymentMethod
                 println("kdh 4")
@@ -471,7 +474,7 @@ class DashboardViewModel(
                     println("kdh 11 "+ response)
                     if (response!!.responseCode == 0) {
                         cartRepository.getOrderReceipt(
-                            VoidOrderRequest(cart.reference)
+                            VoidOrderRequest(cart.reference, businessId = businessId)
                         ).onSuccess { receiptResponseDto ->
                             println("mimi "+ receiptResponseDto?.data?.items?.size)
                             hideAllDialogs()
@@ -552,7 +555,7 @@ class DashboardViewModel(
                 _state.update {
                     it.copy(showPostSalesDialog = MutableTransitionState(true))
                 }
-                val cart = Cart(items = state.value.cartItems)
+                val cart = Cart(items = state.value.cartItems, businessId = businessId, userId = userId)
                 cart.paymentMethod = "cash"
                 cart.reference = Util.generateTransactionReference()
                 val request = cart.toPostSalesRequest()
@@ -622,7 +625,7 @@ class DashboardViewModel(
 
     fun proceedOrders(heldOrdersResponse: SingleHeldOrderDto, reference: String) {
 
-        val cart = Cart(mutableListOf())
+        val cart = Cart(mutableListOf(), businessId = businessId, userId = userId)
         heldOrdersResponse.data.forEach {
             val cartItem = CartItem(
                 itemId = it.productId,

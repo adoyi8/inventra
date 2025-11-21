@@ -1,20 +1,9 @@
 package com.ikemba.inventrar.login.presentation
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ikemba.inventrar.admin.data.domain.useCase.GetRolePermissionsList
 import com.ikemba.inventrar.app.Route
-import com.ikemba.inventrar.core.domain.onError
-import com.ikemba.inventrar.core.domain.onSuccess
-import com.ikemba.inventrar.core.presentation.NavigationViewModel
-import com.ikemba.inventrar.dashboard.utils.Util
-import com.ikemba.inventrar.user.data.mappers.toUser
-import com.ikemba.inventrar.user.domain.UserRepository
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import com.ikemba.inventrar.auth.GoogleAuthUiProvider
 import com.ikemba.inventrar.auth.toUser
 import com.ikemba.inventrar.business.data.database.Business
@@ -22,19 +11,30 @@ import com.ikemba.inventrar.business.data.domain.BusinessRepository
 import com.ikemba.inventrar.business.data.domain.useCase.GetStaffRoleUseCase
 import com.ikemba.inventrar.business.data.dto.CreateBusinessRequest
 import com.ikemba.inventrar.business.data.dto.SearchOrganizationRequest
+import com.ikemba.inventrar.core.domain.onError
+import com.ikemba.inventrar.core.domain.onSuccess
+import com.ikemba.inventrar.core.presentation.NavigationViewModel
+import com.ikemba.inventrar.dashboard.domain.ProductRepository
+import com.ikemba.inventrar.dashboard.utils.Util
+import com.ikemba.inventrar.user.data.mappers.toUser
 import com.ikemba.inventrar.user.domain.User
+import com.ikemba.inventrar.user.domain.UserRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 class UserViewModel(
     private val userRepository: UserRepository,
     private val businessRepository: BusinessRepository,
-    private val getStaffRoleUseCase: GetStaffRoleUseCase
+    private val getStaffRoleUseCase: GetStaffRoleUseCase,
+    private val getRolePermissionsList: GetRolePermissionsList,
+    private val productRepository: ProductRepository
 ): ViewModel()
 {
     private val _state = MutableStateFlow(LoginState())
@@ -141,13 +141,16 @@ class UserViewModel(
     private fun observeUsers() {
         observeUsers?.cancel()
         observeUsers = userRepository
-            .getAllUsers()
+            .getAllUsers() // Ensure your repository maps the Entity's permission list to the User model
             .onEach { users ->
                 if (users.isNotEmpty()) {
                     val userFromDb = users.first()
+
                     _state.update { it ->
                         it.copy(
-                            currentUser = userFromDb
+                            currentUser = userFromDb,
+                            // Load permissions from the DB object into the main state
+                            permissions = userFromDb.permissions
                         )
                     }
                 }
@@ -164,7 +167,7 @@ class UserViewModel(
             userRepository.deleteAllUsers()
             googleAuthUIProvider?.signOut()
             _state.update {
-                it.copy(currentUser = null)
+                LoginState()
             }
         }
     }
@@ -282,26 +285,67 @@ class UserViewModel(
     fun setSelectedBusiness(result: Business) {
         viewModelScope.launch {
             val currentUser = getUser() ?: return@launch
-            val updatedUser = currentUser.copy(
+
+            // 1. Basic update with business info
+            val userWithBusiness = currentUser.copy(
                 businessId = result.businessId,
                 businessName = result.name
             )
 
-            // Update the state immediately to trigger navigation and LaunchedEffect
-            _state.update { it.copy(currentUser = updatedUser) }
+            // Update UI immediately for responsiveness (optional, but keeps UI snappy)
+            _state.update { it.copy(currentUser = userWithBusiness) }
 
+            // 2. Fetch Role
             getStaffRoleUseCase(currentUser.id, result.businessId).onSuccess { staff ->
-                val userWithRole = updatedUser.copy(roleName = staff?.role, staffNo = staff?.staffId)
-                userRepository.saveUserInLocalDb(userWithRole)
-                // Reflect role update in state as well
-                _state.update { it.copy(currentUser = userWithRole) }
+                val roleId = staff?.role
+
+                if (roleId != null) {
+                    // 3. Fetch Permissions using the Role ID
+                    getRolePermissionsList(roleId, businessId = result.businessId)
+                        .onSuccess { permissions ->
+
+                            // 4. Create final user object WITH Role AND Permissions
+                            val finalUser = userWithBusiness.copy(
+                                roleName = staff.role, // or role name if you have it
+                                staffNo = staff.staffId,
+                                roleId = roleId,
+                                permissions = permissions // <--- STORE PERMISSIONS IN USER
+                            )
+
+                            // 5. Save to DB (Now persists permissions)
+                            userRepository.saveUserInLocalDb(finalUser)
+
+                            // 6. Update State
+                            _state.update {
+                                it.copy(
+                                    currentUser = finalUser,
+                                    permissions = permissions
+                                )
+                            }
+                        }
+                        .onError {
+                            // Handle permission fetch failure
+                            saveUserAndSetEmptyPermissions(userWithBusiness, staff.staffId, roleId)
+                        }
+                } else {
+                    // Role not found
+                    saveUserAndSetEmptyPermissions(userWithBusiness, null, null)
+                }
             }.onFailure {
-                // Even if getting staff role fails, persist the business selection
-                userRepository.saveUserInLocalDb(updatedUser)
+                // Failed to get staff role
+                userRepository.saveUserInLocalDb(userWithBusiness)
+                _state.update { it.copy(currentUser = userWithBusiness, permissions = emptyList()) }
             }
-
         }
+    }
 
+    // Helper to reduce code duplication
+    private suspend fun saveUserAndSetEmptyPermissions(user: User, staffNo: String?, roleId: String?) {
+        val updatedUser = user.copy(staffNo = staffNo, roleId = roleId, permissions = emptyList())
+        userRepository.saveUserInLocalDb(updatedUser)
+        _state.update {
+            it.copy(currentUser = updatedUser, permissions = emptyList())
+        }
     }
 
     fun exitBusiness() {
@@ -313,8 +357,51 @@ class UserViewModel(
                 roleName = null
             )
             userRepository.saveUserInLocalDb(clearedUser)
-            // Update state so UI reacts immediately
-            _state.update { it.copy(currentUser = clearedUser) }
+            productRepository.clear()
+            // Update state so UI reacts immediately and clear permissions
+            _state.update { 
+                it.copy(
+                    currentUser = clearedUser,
+                    permissions = emptyList()
+                )
+            }
         }
+    }
+    
+    /**
+     * Check if the current user has a specific permission
+     * @param permissionId The ID of the permission to check (e.g., "view_inventory", "add_products")
+     * @return true if the user has the permission, false otherwise
+     */
+    fun hasPermission(permissionId: String): Boolean {
+        return _state.value.permissions.contains(permissionId)
+    }
+    
+    /**
+     * Check if the current user has any of the specified permissions
+     * @param permissionIds List of permission IDs to check
+     * @return true if the user has at least one of the permissions, false otherwise
+     */
+    fun hasAnyPermission(permissionIds: List<String>): Boolean {
+        val userPermissionIds = _state.value.permissions.map { it }.toSet()
+        return permissionIds.any { it in userPermissionIds }
+    }
+    
+    /**
+     * Check if the current user has all of the specified permissions
+     * @param permissionIds List of permission IDs to check
+     * @return true if the user has all of the permissions, false otherwise
+     */
+    fun hasAllPermissions(permissionIds: List<String>): Boolean {
+        val userPermissionIds = _state.value.permissions.map { it }.toSet()
+        return permissionIds.all { it in userPermissionIds }
+    }
+    
+    /**
+     * Get all permission IDs for the current user
+     * @return List of permission IDs
+     */
+    fun getPermissionIds(): List<String> {
+        return _state.value.permissions.map { it }
     }
 }

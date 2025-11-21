@@ -24,7 +24,7 @@ fun Cart.toCartEntity(): CartEntity {
 
 fun Cart.toPostSalesRequest(): PostSalesRequest {
     println("ndiaye 1")
-    val result = PostSalesRequest()
+    val result = PostSalesRequest(businessId = this.businessId, userId = this.userId)
     println("ndiaye 2")
     result.payment_method = this.paymentMethod
     println("ndiaye 3")
@@ -51,7 +51,9 @@ fun PostSalesRequest.toPostSalesRequestEntity(): PostSalesRequestEntity {
         total = total,
         total_vat = total_vat,
         grandTotal = grandTotal,
-        syncedStatus = false
+        syncedStatus = false,
+        businessId = businessId,
+        userId = userId
     )
     result.cart = Json.encodeToString(
         this.cart!!.map {
@@ -73,6 +75,8 @@ fun PostSalesRequestEntity.toPostSalesModel(): PostSalesModel {
         total = total,
         total_vat = total_vat,
         grandTotal = grandTotal,
+        businessId = businessId,
+        userId = userId
     )
     result.cart = Json.decodeFromString<List<PostSalesItemModel>>(this.cart ?: "[]")
     return result;
@@ -85,6 +89,8 @@ fun PostSalesModel.toPostSalesRequest(): PostSalesRequest {
         total = total,
         total_vat = total_vat,
         grandTotal = grandTotal,
+        businessId = businessId,
+        userId = this.userId
     )
     result.cart = this.cart!!.map {
         PostSalesItem(

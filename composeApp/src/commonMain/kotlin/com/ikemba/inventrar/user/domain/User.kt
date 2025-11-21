@@ -30,6 +30,7 @@ data class User(
     var defaultTax: String? = null,
     var accessToken: String? = null,
     var businessId: String? = null,
+    val permissions: List<String> = emptyList()
 ){
     fun getFullName(): String{
         return "$firstname $lastname"

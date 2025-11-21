@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 
 class HeldOrderViewModel(
     private val heldOrderRepository: HeldOrderRepository,
+    private val businessId: String = ""
 ): ViewModel(){
     private val _state = MutableStateFlow(HeldOrderState())
 
@@ -95,7 +96,7 @@ class HeldOrderViewModel(
 
                 it.copy(showProgressDialog = MutableTransitionState(true))
             }
-            val voidOrderRequest = VoidOrderRequest(state.value.voidOrderReference)
+            val voidOrderRequest = VoidOrderRequest(state.value.voidOrderReference, businessId)
             heldOrderRepository.voidOrder(Util.accessToken, voidOrderRequest)
                 .onSuccess { heldOrdersResponse ->
                     if(heldOrdersResponse.responseCode == 0){
@@ -122,7 +123,7 @@ class HeldOrderViewModel(
             _state.update {
                 it.copy(showProgressDialog = MutableTransitionState(true))
             }
-            val voidOrderRequest = VoidOrderRequest(reference)
+            val voidOrderRequest = VoidOrderRequest(reference, businessId)
             heldOrderRepository.getSingleHeldOrder(Util.accessToken, voidOrderRequest)
                 .onSuccess { heldOrdersResponse ->
                  if(heldOrdersResponse.responseCode ==0){

@@ -82,163 +82,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@Composable
-fun TransactionScreen(viewModel: TransactionHistoryViewModel = koinViewModel()) {
-    var selectedEntries by remember { mutableStateOf("10") }
-    var selectedDateRange by remember { mutableStateOf("Select Date Range") }
-    var showDateRangeDropDown = MutableTransitionState(false)
-    val paginationRequest = remember { mutableStateOf(PaginationRequest()) }
-
-
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(true) {
-        viewModel.getTransactionHistory(paginationRequest.value)
-    }
-    Scaffold() { padding ->
-        Box(modifier = Modifier.fillMaxSize().background(CustomGrey)) {
-
-
-            Column(modifier = Modifier.fillMaxSize().padding(24.dp).background(Color.Transparent)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column() {
-                        CustomText("Transaction", size = 24.sp, color = Color.Black)
-                        CustomText(
-                            "Here is your transaction summary", size = 14.sp, color = Color.Gray
-                        )
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        DropdownMenuSample(paginationRequest = paginationRequest)
-                        Row(
-                            modifier = Modifier.background(Color.White).clickable(
-                            onClick = {
-                                showDateRangeDropDown.targetState = true
-                            })) {
-
-                            OutlinedTextField(
-                                value = selectedDateRange,
-                                onValueChange = {},
-                                readOnly = true,
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(Res.drawable.calendar),
-                                        contentDescription = "",
-                                        modifier = Modifier.size(35.dp).clickable(
-                                                onClick = {
-                                                    showDateRangeDropDown.targetState = true
-                                                }
-
-                                            ))
-                                },
-                                trailingIcon = {
-
-                                    Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = "Clear",
-                                        modifier = Modifier.clickable(
-                                            onClick = {
-                                                selectedDateRange = "Select Date Range"
-                                                viewModel.searchByDateRange(
-                                                    "", "", paginationRequest
-                                                )
-                                            }))
-                                },
-                                modifier = Modifier.clickable(
-                                    onClick = { showDateRangeDropDown.targetState = true })
-
-                            )
-                        }
-                        AnimatedVisibility(
-                            visibleState = showDateRangeDropDown
-                        ) {
-                            DateRangePickerModal(
-                                onDismiss = {
-                                    showDateRangeDropDown.targetState = false
-                                }, onDateRangeSelected = {
-                                    val stringBuilder: StringBuilder = StringBuilder()
-                                    it.first?.let {
-                                        stringBuilder.append(formatDate(it))
-
-                                    }
-                                    it.second?.let {
-                                        stringBuilder.append(" - ")
-                                        stringBuilder.append(formatDate(it))
-                                    }
-                                    selectedDateRange = stringBuilder.toString()
-                                }, paginationRequest = paginationRequest
-                            )
-                        }
-                    }
-                }
-
-
-                Spacer(modifier = Modifier.height(20.dp))
-                Column(modifier = Modifier.fillMaxSize().background(Color.White).padding(20.dp)) {
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Column(modifier = Modifier.fillMaxHeight(0.9f)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(
-                                modifier = Modifier,
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(5.dp)
-                            ) {
-                                CustomText("show: ")
-                                NumberPicker(viewModel, paginationRequest)
-                                CustomText("Entries: ")
-                            }
-                            Row(modifier = Modifier.width(350.dp)) {
-                                SearchBar(paginationRequest = paginationRequest)
-                            }
-
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        TransactionTable()
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                    PaginationControls(viewModel, paginationRequest = paginationRequest)
-                }
-            }
-            if (state.value.transactionHistory.orders!!.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(24.dp).background(Color.Transparent),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CustomText("There are no Items to display")
-                }
-            }
-            AnimatedVisibility(visibleState = state.value.showProgressDialog) {
-                ProgressDialog("Fetching Transaction history")
-            }
-            val onDismiss = {
-                viewModel.toggleShowReceipt(false)
-            }
-            ReceiptDialog(state.value.showReceipt, onDismiss, state.value.receiptModel)
-            SnackbarHost(
-                hostState = state.value.snackBarHostState,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-    }
-}
 
 
 @Composable
@@ -250,7 +93,7 @@ fun SearchBar(
     var debounceJob by remember { mutableStateOf<Job?>(null) }
     val coroutineScope = rememberCoroutineScope()
     Box(
-        modifier = Modifier.fillMaxWidth().background(Color.LightGray, RoundedCornerShape(8.dp))
+        modifier = Modifier.fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -422,7 +265,8 @@ fun PaginationControls(
 @Composable
 fun DropdownMenuSample(
     viewModel: TransactionHistoryViewModel = koinViewModel(),
-    paginationRequest: MutableState<PaginationRequest>
+    paginationRequest: MutableState<PaginationRequest>,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val options = listOf("select::", "daily", "weekly", "monthly")
@@ -433,7 +277,7 @@ fun DropdownMenuSample(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = Modifier.background(Color.White).width(170.dp),
+        modifier = modifier,
 
         ) {
         OutlinedTextField(
@@ -530,83 +374,5 @@ fun formatDateFilter(timestamp: Long): String {
     return sdf.format(Date(timestamp))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NumberPicker(
-    transactionHistoryViewModel: TransactionHistoryViewModel = koinViewModel(),
-    paginationRequest: MutableState<PaginationRequest>
-) {
-    var selectedOption by remember { mutableStateOf(paginationRequest.value.limit.toString()) } // Default: "Weekly"
-    var debounceJob by remember { mutableStateOf<Job?>(null) }
-    val coroutineScope = rememberCoroutineScope()
 
-    OutlinedTextField(
-        value = selectedOption, onValueChange = {
-            try {
-                if (it.toInt() > 0) {
-                    selectedOption = it
-                    debounceJob?.cancel()
-                    transactionHistoryViewModel.hideAllDialogs()
-                    debounceJob = coroutineScope.launch {
-                        delay(2000)
-                        paginationRequest.value.limit = it.toInt()
-                        transactionHistoryViewModel.getTransactionHistory(paginationRequest.value)
-                    }
-
-
-                }
-            } catch (e: Exception) {
-                if (it.isEmpty()) {
-                    selectedOption = it
-                }
-            }
-        }, trailingIcon = {
-            Column() {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowUp,
-                    contentDescription = "",
-                    modifier = Modifier.clickable(onClick = {
-                        try {
-                            selectedOption = (selectedOption.toInt() + 1).toString()
-                            debounceJob?.cancel()
-                            transactionHistoryViewModel.hideAllDialogs()
-                            debounceJob = coroutineScope.launch {
-                                delay(2000)
-                                paginationRequest.value.limit = selectedOption.toInt()
-                                transactionHistoryViewModel.getTransactionHistory(paginationRequest.value)
-                            }
-                        } catch (e: Exception) {
-
-                        }
-                    })
-                )
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "",
-                    modifier = Modifier.clickable(onClick = {
-                        try {
-                            if (selectedOption.toInt() > 0) {
-                                selectedOption = (selectedOption.toInt() - 1).toString()
-                                debounceJob?.cancel()
-                                transactionHistoryViewModel.hideAllDialogs()
-                                debounceJob = coroutineScope.launch {
-                                    delay(2000)
-                                    paginationRequest.value.limit = selectedOption.toInt()
-                                    transactionHistoryViewModel.getTransactionHistory(
-                                        paginationRequest.value
-                                    )
-                                }
-                            }
-                        } catch (e: Exception) {
-
-                        }
-                    })
-                )
-            }
-        }, modifier = Modifier
-
-            .width(120.dp).height(50.dp)
-    )
-
-}
 

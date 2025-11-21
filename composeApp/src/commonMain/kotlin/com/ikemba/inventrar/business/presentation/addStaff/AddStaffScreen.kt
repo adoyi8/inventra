@@ -54,7 +54,7 @@ fun AddStaffScreen(viewModel: AddStaffViewModel, title: MutableState<String>) {
             ) {
                 uiState.roles.forEach { role -> // <-- Use uiState.roles
                     DropdownMenuItem(
-                        text = { CustomText(role) },
+                        text = { CustomText(role.name) },
                         onClick = {
                             viewModel.onRoleSelected(role)
                             roleExpanded = false
@@ -152,7 +152,6 @@ fun AddStaffScreen(viewModel: AddStaffViewModel, title: MutableState<String>) {
                         onClick = { viewModel.addStaff(uiState.selectedRole) },
                         enabled = uiState.selectedRole.isNotBlank()
                                 && uiState.selectedDepartmentId.isNotBlank()
-                                && uiState.selectedBranchId.isNotBlank()
                                 && !uiState.isLoading // <-- Disable button while adding
                     ) { CustomText("Add Staff") }
                 }

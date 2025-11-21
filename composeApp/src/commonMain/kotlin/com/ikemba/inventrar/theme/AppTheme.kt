@@ -99,4 +99,5 @@ object TextSize {
     val titleSmall = 14.sp
     val bodyMedium = 14.sp
     val bodySmall = 12.sp
+    val titleLarge = 22.sp
 }

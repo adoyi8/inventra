@@ -10,7 +10,7 @@ import com.ikemba.inventrar.core.domain.Result
 
 interface ProductRepository {
 
-    suspend fun getProducts(accessToken: String): Result<ProductResponseDto,DataError.Remote>
+    suspend fun getProducts(businessId: String): Result<ProductResponseDto,DataError.Remote>
     suspend fun saveCategory(category: CategoryEntity): EmptyResult<DataError.Local>
     suspend fun saveItem(item: ItemEntity): EmptyResult<DataError.Local>
     suspend fun clear()

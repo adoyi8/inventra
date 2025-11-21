@@ -1,5 +1,6 @@
 package com.ikemba.inventrar.cart.domain
 
+import com.ikemba.inventrar.business.data.database.Business
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
@@ -12,5 +13,7 @@ data class PostSalesModel(
     var grandTotal: Double? = null,
     var payment_method: String? = null,
     var reference: String,
-    val created: String = LocalDateTime.now().toString()
+    val created: String = LocalDateTime.now().toString(),
+    val businessId: String,
+    val userId: String
 )

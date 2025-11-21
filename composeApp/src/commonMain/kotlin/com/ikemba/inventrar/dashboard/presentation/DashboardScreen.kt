@@ -68,74 +68,8 @@ fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
     // --- End New State ---
 
     BoxWithConstraints {
-        // Determine layout based on width. 600.dp is a common breakpoint.
-       // val isMobile = maxWidth < 600.dp
         val isMobile = true
-
-        Scaffold(
-//            topBar = {
-//                TopAppBar(
-//                    navigationIcon = {
-//                        Image(
-//                            painter = painterResource(Res.drawable.inventra_logo_and_text),
-//                            contentDescription = "Inventrar Logo",
-//                            colorFilter = ColorFilter.tint(Color.White),
-//                            modifier = Modifier.padding(10.dp)
-//                        )
-//                    },
-//                    title = {
-////                        Row(
-////                            modifier = Modifier.fillMaxWidth(),
-////                            horizontalArrangement = Arrangement.SpaceBetween
-////                        )
-////                        {
-////
-////                            // Only show TopMenu in the app bar on desktop
-////                            if (!isMobile) {
-////                                TopMenu(viewModel)
-////                            }
-////
-////                            if (state.value.users.isNotEmpty()) {
-////                                Row(
-////                                    verticalAlignment = Alignment.CenterVertically,
-////                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-////                                ) {
-////                                    ProfileImage(
-////                                        imageUrl = state.value.users.first().businessLogo,
-////                                        content = {}
-////                                    )
-////                                    Column {
-////                                        CustomText(
-////                                            state.value.users.first().getFullName(),
-////                                            color = Color.White
-////                                        )
-////                                    }
-////                                    Icon(
-////                                        painter = painterResource(Res.drawable.logout),
-////                                        contentDescription = "Logout",
-////                                        tint = Color.White,
-////                                        modifier = Modifier.size(43.dp).padding(start = 8.dp)
-////                                            .clickable(
-////                                                onClick = { viewModel.showShowConfirmLogout() },
-////                                                enabled = state.value.users.isNotEmpty()
-////                                            )
-////                                    )
-////                                }
-////                            }
-////                        }
-//                    },
-//                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF236ff9))
-//                )
-//            },
-            // --- New Mobile Bottom Navigation Bar ---
-//            bottomBar = {
-//                if (isMobile) {
-//                    MobileBottomNavigation(viewModel, state.value.selectedMenuIndex.currentState)
-//                }
-//            }
-            // --- End New Bottom Bar ---
-
-        ) { padding ->
+        Scaffold() { padding ->
             Box(modifier = Modifier.padding(padding).fillMaxSize()) {
 
                 // --- POS View (Index 0) ---
@@ -146,9 +80,7 @@ fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
 
-                        // --- RESPONSIVE LAYOUT LOGIC ---
                         if (isMobile) {
-                            // Mobile: Just the body, and a FAB to open the cart
                             POSSCreenBody(
                                 viewModel = viewModel,
                                 modifier = Modifier.fillMaxSize(),
@@ -191,7 +123,7 @@ fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
-                    TransactionScreen()
+                    TransactionScreen(userViewModel= userViewModel)
                 }
                 AnimatedVisibility(
                     visible = state.value.selectedMenuIndex.currentState == 3,

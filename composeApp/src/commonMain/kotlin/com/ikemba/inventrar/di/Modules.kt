@@ -94,6 +94,12 @@ import com.ikemba.inventrar.audit.data.domain.useCase.*
 import com.ikemba.inventrar.department.DepartmentViewModel
 import com.ikemba.inventrar.inventory.presentation.*
 import com.ikemba.inventrar.audit.presentation.AuditTrailViewModel
+import com.ikemba.inventrar.expense.domain.ExpenseRepository
+import com.ikemba.inventrar.expense.presentation.ExpenseViewModel
+import com.ikemba.inventrar.expense.data.repository.DefaultExpenseRepository
+import com.ikemba.inventrar.expense.domain.CreateExpenseUseCase
+import com.ikemba.inventrar.expense.domain.GetExpenseCategoriesUseCase
+import com.ikemba.inventrar.expense.domain.GetExpensesUseCase
 
 expect val platformModule: Module
 
@@ -103,6 +109,8 @@ val sharedModule = module {
     singleOf(::DefaultUserRepository).bind<UserRepository>()
     singleOf(::KtorRemoteUserDataSource).bind<RemoteUserDataSource>()
     singleOf(::DefaultProductRepository).bind<ProductRepository>()
+    // --- ADD EXPENSE REPOSITORY ---
+    singleOf(::DefaultExpenseRepository).bind<ExpenseRepository>()
     // RemoteProductDataSource no longer used for products; Firestore used instead
     singleOf(::DefaultCartRepository).bind<CartRepository>()
     // RemoteCartDataSource no longer used for cart; Firestore used instead
@@ -127,6 +135,12 @@ val sharedModule = module {
     singleOf(::DefaultInventoryRepository).bind<InventoryRepository>()
     // Audit Trail Management
     singleOf(::DefaultAuditTrailRepository).bind<AuditTrailRepository>()
+
+
+    // --- ADD EXPENSE USE CASES ---
+    factoryOf(::GetExpensesUseCase)
+    factoryOf(::CreateExpenseUseCase)
+    factoryOf(::GetExpenseCategoriesUseCase)
 
     // Department use cases
     factoryOf(::CreateDepartmentUseCase)
@@ -215,6 +229,7 @@ val sharedModule = module {
     factoryOf(::AssignPermissionsToRoleUseCase)
     factoryOf(::RemovePermissionsFromRoleUseCase)
     factoryOf(::GetRolePermissionsUseCase)
+    factoryOf(::GetRolePermissionsList)
     factoryOf(::AssignRoleToUserUseCase)
     factoryOf(::RemoveRoleFromUserUseCase)
     factoryOf(::GetUserRolesUseCase)
@@ -343,6 +358,15 @@ val sharedModule = module {
             getLocationsUseCase = get(),
             businessId = params.get(),
             staffId = params.get()
+        )
+    }
+    viewModel { params ->
+        ExpenseViewModel(
+            getExpensesUseCase = get(),
+            createExpenseUseCase = get(),
+            getExpenseCategoriesUseCase = get(),
+            businessRepository = get(),
+            businessId = params.get() // Pass businessId like you do for other VMs
         )
     }
 

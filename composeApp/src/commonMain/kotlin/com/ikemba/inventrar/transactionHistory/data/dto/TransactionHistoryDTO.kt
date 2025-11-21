@@ -24,5 +24,6 @@ data class Transaction(
     @SerialName("order_id") val orderId: String,
     @SerialName("created") val created: String,
     @SerialName("payment_method") val paymentMethod: String,
-    @SerialName("total_amount") val totalAmount: String
+    @SerialName("total_amount") val totalAmount: String,
+    @SerialName("createdBy") val createdBy: String
 )

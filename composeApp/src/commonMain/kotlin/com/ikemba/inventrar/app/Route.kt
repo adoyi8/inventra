@@ -17,6 +17,9 @@ sealed interface Route {
     data object SplashScreen: Route
 
     @Serializable
+    data object ExpensesScreen: Route
+
+    @Serializable
     data object POSScreen: Route
 
     @Serializable

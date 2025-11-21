@@ -23,11 +23,14 @@ class DefaultProductRepository(
     private val firestore: FirebaseFirestore,
     private val productDao: ProductDao
 ): ProductRepository {
-    override suspend fun getProducts(accessToken: String): Result<ProductResponseDto, DataError.Remote> {
+    override suspend fun getProducts(businessId: String): Result<ProductResponseDto, DataError.Remote> {
         return try {
-            // Fetch categories and items from Firestore
-            val categoriesSnapshot = firestore.collection("categories").get().await()
-            val itemsSnapshot = firestore.collection("products").get().await()
+            // Define the parent document for this business
+            val businessDocRef = firestore.collection("businesses").document(businessId)
+
+            // Fetch categories and items from subcollections of the business document
+            val categoriesSnapshot = businessDocRef.collection("categories").get().await()
+            val itemsSnapshot = businessDocRef.collection("products").get().await()
 
             val categories = categoriesSnapshot.documents.mapNotNull { doc ->
                 try {
@@ -65,7 +68,6 @@ class DefaultProductRepository(
             Result.Error(DataError.Remote.UNKNOWN)
         }
     }
-
     override suspend fun saveCategory(category: CategoryEntity): EmptyResult<DataError.Local> {
         return try {
             productDao.saveCategory(category)

@@ -35,4 +35,5 @@ data class UserEntity(
     val userId: String? = null,
     var organizationId: String? = null,
     var organizationName: String? = null,
+    val permissions: List<String> = emptyList()
 )

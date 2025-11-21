@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VoidOrderRequest(
-    val reference: String
+    val reference: String,
+    val businessId: String
 )

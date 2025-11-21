@@ -22,6 +22,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.auth.FirebaseAuth
 import com.ikemba.inventrar.business.AnimatedButton
 import com.ikemba.inventrar.business.RoomItem
 import com.ikemba.inventrar.business.data.database.Business
@@ -40,7 +42,11 @@ import kotlinx.coroutines.delay
 fun BusinessListScreen(viewModel: BusinessListViewModel, userViewModel: UserViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     var showCreateDialog by remember { mutableStateOf(false) }
-    
+    val userState by userViewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(FirebaseAuth.getInstance().currentUser){
+        println("vicky ")
+        viewModel.loadBusinesses(FirebaseAuth.getInstance().currentUser?.uid)
+    }
 
     Scaffold(
         floatingActionButton = {

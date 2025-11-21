@@ -12,7 +12,7 @@ import com.ikemba.inventrar.cart.data.database.PostSalesRequestEntity
 
 @Database(
     entities = [CategoryEntity::class, ItemEntity::class, CartEntity::class, PostSalesRequestEntity::class],
-    version = 8
+    version = 10
 )
 
 

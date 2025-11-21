@@ -4,29 +4,25 @@ import androidx.sqlite.SQLiteException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ikemba.inventrar.admin.data.domain.model.Branch
+import com.ikemba.inventrar.admin.data.domain.model.Department
+import com.ikemba.inventrar.admin.data.domain.model.SystemRoles
 import com.ikemba.inventrar.business.data.database.Business
 import com.ikemba.inventrar.business.data.database.BusinessDao
 import com.ikemba.inventrar.business.data.domain.BusinessRepository
 import com.ikemba.inventrar.business.data.domain.model.AppUser
 import com.ikemba.inventrar.business.data.domain.model.Staff
-import com.ikemba.inventrar.business.data.domain.model.StaffRole
 import com.ikemba.inventrar.business.data.dto.CreateBusinessRequest
 import com.ikemba.inventrar.business.data.dto.OrganizationResponse
 import com.ikemba.inventrar.business.data.dto.SearchOrganizationRequest
-import com.ikemba.inventrar.business.data.dto.SearchOrganizationResult
 import com.ikemba.inventrar.business.network.RemoteBusinessDataSource
 import com.ikemba.inventrar.core.data.dto.ResponseDto
-import com.ikemba.inventrar.admin.data.domain.model.Department
-import com.ikemba.inventrar.admin.data.domain.model.Branch
-import com.ikemba.inventrar.admin.data.domain.model.SystemRoles
 import com.ikemba.inventrar.core.domain.DataError
 import com.ikemba.inventrar.core.domain.EmptyResult
 import com.ikemba.inventrar.core.domain.Result
 import com.ikemba.inventrar.heldOrder.data.dto.SingleHeldOrderDto
 import com.ikemba.inventrar.heldOrder.data.dto.VoidOrderRequest
-import com.ikemba.inventrar.user.data.database.UserDao
-import com.ikemba.inventrar.user.data.mappers.toUserEntity
-import com.ikemba.inventrar.user.domain.User
+import com.ikemba.inventrar.utils.StringUtil.BUSINESS_COLLECTION
 import kotlinx.coroutines.tasks.await
 
 class DefaultBusinessRepository(
@@ -59,6 +55,8 @@ class DefaultBusinessRepository(
     }
     override suspend fun getBusinessesForUser(userId: String): kotlin.Result<List<Business>> = runCatching {
         // 1. Find all staff entries for the user
+
+
         val staffEntries = firestore.collection("staff")
             .whereEqualTo("userId", userId)
             .get().await().toObjects(Staff::class.java)
@@ -78,7 +76,7 @@ class DefaultBusinessRepository(
     override suspend fun createBusiness(businessName: String, owner: FirebaseUser): kotlin.Result<Unit> = runCatching {
         val businessRef = firestore.collection("businesses").document()
         val businessId = businessRef.id
-
+        println("shiva "+ businessName)
         val newBusiness = Business(
             businessId = businessId,
             name = businessName,
@@ -86,7 +84,8 @@ class DefaultBusinessRepository(
         )
 
         // Create default Admin department
-        val departmentRef = firestore.collection("departments").document()
+        val busRef = firestore.collection(BUSINESS_COLLECTION).document(businessId)
+        val departmentRef = busRef.collection("departments").document()
         val adminDepartment = Department(
             id = departmentRef.id,
             name = "Admin",
@@ -97,7 +96,7 @@ class DefaultBusinessRepository(
         )
 
         // Create default Headquarters branch
-        val branchRef = firestore.collection("branches").document()
+        val branchRef = busRef.collection("branches").document()
         val hqBranch = Branch(
             id = branchRef.id,
             name = "Headquarters",
@@ -107,19 +106,30 @@ class DefaultBusinessRepository(
             updatedBy = owner.uid
         )
 
-        // --- MODIFICATIONS START ---
+        // Create manager role using SystemRoles.MANAGER template
+        // Generate a unique document ID for the manager role
 
-        // 1. Generate the default system roles for this business
-        // (This assumes SystemRoles.createSystemRolesForBusiness returns the list of roles)
-        val systemRoles = SystemRoles.createSystemRolesForBusiness(businessId, owner.uid)
+        val managerRoleRef = busRef.collection("roles").document()
+        val managerRoleId = managerRoleRef.id
+        
+        // Create the manager role with a unique ID and all permissions from SystemRoles.MANAGER
+        val managerRole = SystemRoles.MANAGER.copy(
+            id = managerRoleId,
+            businessId = businessId,
+            createdBy = owner.uid,
+            updatedBy = owner.uid
+        )
 
-        // 2. Find the "Manager" role from the list.
-        // This search handles case-insensitivity and checks that it's a system role.
-        val managerRole = systemRoles.firstOrNull {
-            it.name.equals("Manager", ignoreCase = true) && it.isSystemRole
-        } ?: throw IllegalStateException("System 'Manager' role could not be found or created.")
+        // Create all other system roles for this business
+        // Generate unique document IDs for each role
+        val otherSystemRoles = SystemRoles.createSystemRolesForBusiness(businessId, owner.uid)
+            .filter { it.id != SystemRoles.MANAGER.id }
+            .map { role ->
+                val roleRef = busRef.collection("roles").document()
+                Pair(roleRef, role.copy(id = roleRef.id))
+            }
 
-        // 3. Add the creator as a staff member using the found Manager Role ID
+        // Add the creator as a staff member using the Manager Role ID (not the name)
         val staffRef = firestore.collection("staff").document()
         val newStaffEntry = Staff(
             staffId = staffRef.id,
@@ -127,24 +137,26 @@ class DefaultBusinessRepository(
             userId = owner.uid,
             departmentId = adminDepartment.id,
             branchId = hqBranch.id,
-            role = managerRole.id // <-- Assign the ID, not the string "manager"
+            name = owner.displayName?:"",
+            role = managerRoleId // Assign the unique role document ID, not the name
         )
 
-        // 4. Use a batch write for atomicity
+        // Use a batch write for atomicity
         firestore.batch().apply {
             set(businessRef, newBusiness)
             set(departmentRef, adminDepartment)
             set(branchRef, hqBranch)
             set(staffRef, newStaffEntry)
 
-            // 5. Add all the newly created system roles to the same batch
-            systemRoles.forEach { role ->
-                val roleRef = firestore.collection("roles").document(role.id)
+            // Save the manager role with its unique document ID
+            set(managerRoleRef, managerRole)
+
+            // Save all other system roles with their unique document IDs
+            otherSystemRoles.forEach { (roleRef, role) ->
                 set(roleRef, role)
             }
 
         }.commit().await()
-        // --- MODIFICATIONS END ---
     }
     override suspend fun findUserByEmail(email: String): kotlin.Result<AppUser?> = runCatching {
         val userDocument = firestore.collection("users")
@@ -164,7 +176,8 @@ class DefaultBusinessRepository(
             departmentId = departmentId,
             branchId = branchId,
             role = role,
-            active = true
+            active = true,
+            name = user.fullName
         )
         staffRef.set(newStaffEntry).await()
     }

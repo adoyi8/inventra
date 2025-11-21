@@ -12,4 +12,6 @@ data class PostSalesRequest(
     var payment_method: String? = null,
     var reference: String? = null,
     var is_held: Boolean = false,
+    var businessId: String,
+    var userId: String
 )

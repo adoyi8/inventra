@@ -11,5 +11,6 @@ data class Staff(
     val departmentId: String = "",
     val branchId: String = "",
     val role: String = "",
-    val active: Boolean = true
+    val active: Boolean = true,
+    val name: String = ""
 )
