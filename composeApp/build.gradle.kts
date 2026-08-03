@@ -17,9 +17,11 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+// ...
+
 
     jvm("desktop")
 
@@ -36,31 +38,31 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
             implementation(libs.ktor.client.okhttp)
-          //  implementation("com.google.android.gms:play-services-auth:21.2.0")
-            // Android Credential Manager
-            implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-            implementation("com.google.android.gms:play-services-auth:21.3.0") // Use the newer version
-            implementation("com.google.android.gms:play-services-base:18.4.0")
-            implementation("androidx.credentials:credentials:1.2.2")
-            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+
+            // Android Credential Manager & Auth
+            implementation(platform("com.google.firebase:firebase-bom:33.7.0")) // Updated BOM
+            implementation("com.google.android.gms:play-services-auth:21.3.0")
+            implementation("com.google.android.gms:play-services-base:18.5.0")
+            implementation("androidx.credentials:credentials:1.3.0")
+            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
         }
         commonMain.dependencies {
             // FIX 1: Use the Compose BOM to enforce consistent versions for all Compose dependencies
-            // This manages versions for dependencies like compose.ui, compose.foundation, and the lifecycle libraries
-            implementation(platform(libs.androidx.compose.bom.get()))
+            implementation(libs.androidx.compose.bom)
 
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material3)
+
+            // Material 3 Expressive (The reason we needed SDK 35)
+            implementation("org.jetbrains.compose.material3:material3:1.9.0-alpha04")
+
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
-            // Removed explicit androidx.lifecycle dependencies (e.g., lifecycle-runtime-compose:2.7.0)
-            // as they are now managed by the BOM to prevent conflicts.
-            implementation(libs.androidx.lifecycle.viewmodel) // Retained but version is BOM-managed
+            implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose) // Retained but version is BOM-managed
+            implementation(libs.androidx.lifecycle.runtime.compose)
 
             implementation("org.usb4java:usb4java:1.3.0")
             implementation(libs.jetbrains.compose.navigation)
@@ -73,25 +75,20 @@ kotlin {
 
             implementation(libs.bundles.ktor)
             implementation(libs.bundles.coil)
-            implementation("org.jsoup:jsoup:1.15.3")
-            implementation("org.apache.commons:commons-text:1.10.0")
+            implementation("org.jsoup:jsoup:1.18.3") // Minor update for security
+            implementation("org.apache.commons:commons-text:1.12.0") // Minor update
 
-
-            // FIX 2: Upgraded Multiplatform Firebase Auth to a modern version (2.3.0)
-            // The older version 1.10.3 was a likely cause of the NoSuchMethodError conflict.
+            // FIX 2: Upgraded Multiplatform Firebase Auth
             implementation("dev.gitlive:firebase-auth:2.3.0")
             implementation("dev.gitlive:firebase-firestore:2.3.0")
-
-
+            implementation(compose.materialIconsExtended)
+            implementation(libs.connectivity.kmp)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
-            // Removed conflicting dependency, relying on GitLive KMP implementation now.
-            // implementation("com.google.firebase:firebase-admin:9.2.0")
-           // implementation("dev.gitlive:firebase-admin:2.3.0")
-            //implementation("dev.gitlive:firebase-java-sdk:0.6.2")
+            implementation("com.github.librepdf:openpdf:1.3.30")
         }
         dependencies {
             ksp(libs.androidx.room.compiler)
@@ -100,17 +97,18 @@ kotlin {
 }
 
 android {
-    namespace = "com.ikemba.inventrar"
+    namespace = "com.sundroid.kobokobo"
+
+    // Reads 35 from libs.versions.toml
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.ikemba.inventrar"
+        applicationId = "com.sundroid.kobokobo"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
+        versionCode = 5
         versionName = "1.0"
     }
-
 
     packaging {
         resources {
@@ -123,93 +121,46 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
-    //implementation(project(":composeApp"))
     debugImplementation(compose.uiTooling)
 }
 
-
-
-
-// ... other configurations ...
-
 compose.desktop {
     application {
-        mainClass = "com.ikemba.inventrar.MainKt"
-
-        // Set the application display name here
-        //  name = "Inventrar" // This is the correct property for the application's human-readable name
+        mainClass = "com.sundroid.kobokobo.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Inventrar" // This is the unique identifier for your application
+            packageName = "Inventrar"
             packageVersion = "1.0.0"
 
-
-            // Vendor information
             vendor = "Ikemba"
-
-            // Application description
             description = "An inventory management application."
 
-            // --- Windows specific configurations for MSI ---
             windows {
-                // Set the application icon (.ico file)
-                // Place icon.ico in, for example, 'src/main/resources/icon.ico'
-                // Ensure this path is correct relative to your project root.
                 iconFile.set(project.file("src/commonMain/resources/inventra_logo_colored.ico"))
-
-                // To create a desktop shortcut
-                // The shortcut will typically use the 'application.name'
                 shortcut = true
-
-                // To add an entry to the Start Menu
                 menu = true
-                // The menu entry will also typically use the 'application.name'
-                menuGroup = "Inventrar Applications" // Optional: specify a menu group
-
-                // For Windows, the 'application.name' is generally used as the product name.
-                // If you need a very specific name for the MSI package itself or in "Add/Remove Programs"
-                // that differs from 'application.name', ensure 'packageName' is appropriate or check if
-                // there are specific overrides, though 'application.name' is the primary source.
-
-                // You might need to specify upgrade UUID if you plan to release updates
-                // upgradeUuid = "YOUR_UNIQUE_GUID_HERE" // Generate a new GUID for your app
+                menuGroup = "Inventrar Applications"
             }
 
-            // --- macOS specific configurations (DMG) ---
             macOS {
-                // Set the application icon (.icns file)
-                // Place icon.icns in, for example, 'src/main/resources/icon.icns'
-                // iconFile.set(project.file("src/main/resources/icon.icns"))
-
-                // The application name on macOS will be taken from 'application.name'
-                // and often the .app bundle is named accordingly.
-                // bundleID = "com.ikemba.inventrar" // Usually matches nativeDistributions.packageName
+                // bundleID = "com.sundroid.kobokobo"
             }
 
-            // --- Linux specific configurations (Deb) ---
             linux {
-                // Set the application icon (.png file)
-                // Place icon.png in, for example, 'src/main/resources/icon.png'
-                // iconFile.set(project.file("src/main/resources/icon.png"))
-
-                // The application name on Linux will also be taken from 'application.name'.
                 // appCategory = "Utility"
             }
         }
         buildTypes.release {
             proguard {
-                isEnabled.set(false)  // Disable ProGuard
-                // If you were to enable ProGuard, you would add rules here:
-                // configurationFiles.from(project.file("proguard-rules.pro"))
+                isEnabled.set(false)
             }
         }
     }
-    // The problematic line "name = "Inventrar"" has been removed from here.
 }

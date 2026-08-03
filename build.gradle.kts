@@ -6,21 +6,19 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
-
-
-
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.room) apply false
-    id("com.google.gms.google-services") version "4.4.3" apply false
+    id("com.google.gms.google-services") version "4.4.2" apply false
 }
+
 buildscript {
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven("https://jitpack.io")             // ← JitPack :contentReference[oaicite:0]{index=0}
+        maven("https://jitpack.io")
     }
     dependencies {
-        classpath("com.google.gms:google-services:4.4.1")
+        classpath("com.google.gms:google-services:4.4.2")
     }
 }
