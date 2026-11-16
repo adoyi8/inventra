@@ -1,0 +1,47 @@
+
+{
+    "response_code": 0,
+    "response_message": "Record fetched",
+    "data": {
+        "category": [
+            {
+                "sub_id": "1",
+                "sub_name": "Chicken",
+                "sub_code": "KXJIO"
+            },
+            {
+                "sub_id": "2",
+                "sub_name": "Turkey",
+                "sub_code": "P7MUC"
+            },
+            {
+                "sub_id": "8",
+                "sub_name": "Dry product",
+                "sub_code": "4U8I0"
+            }
+        ],
+        "item": [
+                {
+                    "category_id": "1",
+                    "id": "3",
+                    "name": "Layers",
+                    "unit_price": "1000.00",
+                    "image": null
+                },
+                {
+                    "category_id": "2",
+                    "id": "5",
+                    "name": "Live Turkey",
+                    "unit_price": "34000.00",
+                    "image": null
+                },
+                {
+                    "category_id": "3",
+                    "id": "23",
+                    "name": "Ant",
+                    "unit_price": "4500.00",
+                    "image": "https://app.inventrar.com/uploads/products/chidinobifarmslimited/ant_chidinobifarmslimited.jpg"
+                }
+            ]
+    }
+}
