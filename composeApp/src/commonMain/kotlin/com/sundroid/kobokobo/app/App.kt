@@ -27,15 +27,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import com.sundroid.kobokobo.auth.GoogleAuthUiProvider
 import com.sundroid.kobokobo.business.presentation.BusinessListViewModel
-import com.sundroid.kobokobo.business.presentation.BusinessViewModel
 import com.sundroid.kobokobo.dashboard.presentation.components.ConfirmLogout
-import com.sundroid.kobokobo.dropdowndata.presentation.DropDownSettingsViewModel
 import com.sundroid.kobokobo.theme.AppTheme
 import com.sundroid.kobokobo.user.presentation.ProfileScreen
 
 @Composable
 @Preview
-fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, businessViewModel: BusinessViewModel = koinViewModel(), dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(),adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()  ) {
+fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()  ) {
     AppTheme {
         val navController = rememberNavController()
 
@@ -46,10 +44,10 @@ fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewM
 
         NavHost(
             navController = navController,
-            startDestination = Route.BookGraph
+            startDestination = Route.RootGraph
         ) {
 
-            navigation<Route.BookGraph>(
+            navigation<Route.RootGraph>(
                 startDestination = Route.SplashScreen
             ) {
                 composable<Route.POSScreen>(
@@ -86,14 +84,12 @@ fun App(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewM
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }
                 ) {
-                   // ShrineProfileApp(userViewModel = userViewModel, businessViewModel = businessViewModel, dropDownSettingsViewModel = dropDownSettingsViewModel)
                     TwoStepMenuScreen()
                 }
                 composable<Route.AddItemToInventoryRoute>(
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }
                 ) {
-                    // ShrineProfileApp(userViewModel = userViewModel, businessViewModel = businessViewModel, dropDownSettingsViewModel = dropDownSettingsViewModel)
                     CreateInventoryForm(adminViewModel = adminViewModel, userViewModel = userViewModel)
                 }
 

@@ -29,7 +29,6 @@ import com.sundroid.kobokobo.dashboard.data.mappers.toItemEntity
 import com.sundroid.kobokobo.dashboard.domain.Category
 import com.sundroid.kobokobo.dashboard.domain.ProductRepository
 import com.sundroid.kobokobo.dashboard.utils.Util
-import com.sundroid.kobokobo.heldOrder.data.dto.SingleHeldOrderDto
 import com.sundroid.kobokobo.heldOrder.data.dto.VoidOrderRequest
 import com.sundroid.kobokobo.inventory.data.domain.model.Product
 import com.sundroid.kobokobo.user.domain.UserRepository
@@ -242,7 +241,6 @@ class DashboardViewModel(
                     )
                 }
                 if(users.isNotEmpty()) {
-//                    Util.accessToken = users.last().accessToken!!
                     Util.CURRENCY_CODE = if(users.last().currencyEntity==null) "₦" else  StringEscapeUtils.unescapeHtml4(users.last().currencyEntity!!)
                     //getProducts()
                 }
@@ -301,26 +299,11 @@ class DashboardViewModel(
         }
     }
 
-    fun hideChangePasswordDialog() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(showChangePasswordDialog = false)
-            }
-        }
-
-    }
 
     fun showShowConfirmLogout() {
         viewModelScope.launch {
             _state.update {
                 it.copy(showConfirmLogout = true)
-            }
-        }
-    }
-    fun showChangePasswordDialog() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(showChangePasswordDialog = true)
             }
         }
     }
@@ -766,31 +749,6 @@ class DashboardViewModel(
         }
     }
 
-    fun proceedOrders(heldOrdersResponse: SingleHeldOrderDto, reference: String) {
-        val currentUserId = userId ?: run {
-            showSnackBar("Your session is no longer active. Please sign in again.")
-            return
-        }
-        val cart = Cart(mutableListOf(), businessId = businessId, userId = currentUserId, userName = state.value.users!!.first()!!.getFullName())
-        heldOrdersResponse.data.forEach {
-            val cartItem = CartItem(
-                itemId = it.productId,
-                itemName = it.productName,
-
-                quantity = it.qty.toInt(),
-                vatRate = it.vatRate.toDouble()
-            )
-            cartItem.price = it.subTotal.toDouble() / it.qty.toInt()
-            cart.items.add(cartItem)
-        }
-        cart.reference = reference
-        _state.update {
-            it.copy(
-                cartItems = cart.items,
-                selectedMenuIndex = MutableTransitionState(0)
-            )
-        }
-    }
 
 
     fun postSavedSales() {

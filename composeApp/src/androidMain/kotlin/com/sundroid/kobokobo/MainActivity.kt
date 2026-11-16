@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity(), GoogleAuthLauncher {
 
 
         setContent {
-            SplashScreenRoot(googleAuthUiProvider = googleAuthUiProvider, userViewModel = koinViewModel(), businessViewModel = koinViewModel())
+            SplashScreenRoot(googleAuthUiProvider = googleAuthUiProvider, userViewModel = koinViewModel())
         }
     }
 

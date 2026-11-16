@@ -166,8 +166,7 @@ fun main() {
             SplashScreenRoot(
                 googleAuthUiProvider = GoogleAuthUiProvider(),
                 // 👇 ADD THIS IMPORT AND ARGUMENT:
-                userViewModel = koinViewModel<UserViewModel>(extras = CreationExtras.Empty),
-                businessViewModel = koinViewModel(extras = CreationExtras.Empty)
+                userViewModel = koinViewModel<UserViewModel>(extras = CreationExtras.Empty)
             )
         }
     }

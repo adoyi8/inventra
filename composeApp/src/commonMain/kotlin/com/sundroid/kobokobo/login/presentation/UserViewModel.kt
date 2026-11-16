@@ -10,8 +10,6 @@ import com.sundroid.kobokobo.auth.toUser
 import com.sundroid.kobokobo.business.data.database.Business
 import com.sundroid.kobokobo.business.data.domain.BusinessRepository
 import com.sundroid.kobokobo.business.data.domain.useCase.GetStaffRoleUseCase
-import com.sundroid.kobokobo.business.data.dto.CreateBusinessRequest
-import com.sundroid.kobokobo.business.data.dto.SearchOrganizationRequest
 import com.sundroid.kobokobo.core.domain.onError
 import com.sundroid.kobokobo.core.domain.onSuccess
 import com.sundroid.kobokobo.core.presentation.NavigationViewModel
@@ -59,94 +57,7 @@ class UserViewModel(
         observeUsers()
     }
     val userState = _userState.asStateFlow()
-    private fun login() {
-        viewModelScope.launch {
-            userRepository.login(_state.value.userName.trim(), _state.value.password.trim())
-                .onSuccess { userResponse ->
 
-                    if(userResponse?.responseCode == 0){
-                        Util.accessToken = userResponse.employee?.token!!
-                        userRepository.deleteAllUsers()
-                        userRepository.saveUserInLocalDb(userResponse.toUser())
-                        _state.update {
-                            it.copy( isLoading = false, userName = "", password = "")
-                        }
-                        NavigationViewModel.navController?.navigate(Route.UserProfileRoute)
-                    }
-                    else{
-                        _state.update {
-                            it.copy(errorMessage = userResponse?.responseMessage.toString(), isLoading = false)
-                        }
-                        hideErrorMessageAfterDelay()
-                    }
-
-                }
-                .onError { error->
-                    _state.update {
-                        it.copy(errorMessage = error.toString(), isLoading = false)
-                    }
-                    hideErrorMessageAfterDelay()
-                }
-        }
-    }
-     fun getBusinesses(searchOrganization: SearchOrganizationRequest) {
-        viewModelScope.launch {
-            businessRepository.getBusinesses(Util.accessToken, searchOrganization)
-                .onSuccess { businessResponse ->
-
-                    if(businessResponse.responseCode == 0){
-                        _state.update {
-                            it.copy( isLoading = false, password = "")
-                        }
-                        businessResponse.organizations?.let { business->
-                            _userState.update {
-                                it.copy(business = business)
-                            }
-                        }
-                    }
-                    else{
-                        _state.update {
-                            it.copy(errorMessage = businessResponse?.responseMessage.toString(), isLoading = false)
-                        }
-                        hideErrorMessageAfterDelay()
-                    }
-
-                }
-                .onError { error->
-                    _state.update {
-                        it.copy(errorMessage = error.toString(), isLoading = false)
-                    }
-                    hideErrorMessageAfterDelay()
-                }
-        }
-    }
-
-    private fun createBusinesses(createBusinessRequest: CreateBusinessRequest) {
-        viewModelScope.launch {
-            businessRepository.createBusiness(Util.accessToken, createBusinessRequest)
-                .onSuccess { createBusinessResponse ->
-
-                    if(createBusinessResponse.responseCode == 0){
-                        _state.update {
-                            it.copy( isLoading = false, password = "")
-                        }
-                    }
-                    else{
-                        _state.update {
-                            it.copy(errorMessage = createBusinessResponse?.responseMessage.toString(), isLoading = false)
-                        }
-                        hideErrorMessageAfterDelay()
-                    }
-
-                }
-                .onError { error->
-                    _state.update {
-                        it.copy(errorMessage = error.toString(), isLoading = false)
-                    }
-                    hideErrorMessageAfterDelay()
-                }
-        }
-    }
 
     private fun observeUsers() {
         observeUsers?.cancel()
@@ -206,31 +117,6 @@ class UserViewModel(
     }
     fun onAction(action: LoginAction){
         when(action){
-            is LoginAction.OnLoginButtonClicked ->{
-                _state.update {
-                    it.copy(errorMessage = "")
-                }
-                if(_state.value.userName.isEmpty()){
-                    _state.update {
-                        it.copy(errorMessage = "Please enter your username")
-                    }
-                    hideErrorMessageAfterDelay()
-                    return
-                }
-                if(_state.value.password.isEmpty()){
-                    _state.update {
-                        it.copy(errorMessage = "Please enter your password")
-                    }
-                    hideErrorMessageAfterDelay()
-                    return
-                }
-                _state.update {
-                    it.copy(isLoading = true)
-                }
-
-               login()
-
-            }
             LoginAction.OnGoogleLoginClicked -> {
                 _state.update {
                     it.copy(isLoading = true)
@@ -274,17 +160,6 @@ class UserViewModel(
             }
             is LoginAction.SetVisible -> {
                 _state.update { it.copy(isVisible = action.isVisible) }
-            }
-            is LoginAction.OnPasswordChange ->{
-                _state.update {
-                    it.copy(password = action.password)
-                }
-            }
-            is LoginAction.OnUserNameChange ->{
-
-                _state.update {
-                    it.copy(userName = action.userName)
-                }
             }
             is LoginAction.OnToggleVisibility ->{
 

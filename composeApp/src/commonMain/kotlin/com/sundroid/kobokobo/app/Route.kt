@@ -5,10 +5,7 @@ import kotlinx.serialization.Serializable
 sealed interface Route {
 
     @Serializable
-    data object BookGraph: Route
-
-    @Serializable
-    data object BookList: Route
+    data object RootGraph: Route
 
     @Serializable
     data object Login: Route
@@ -100,9 +97,6 @@ sealed interface Route {
 
     @Serializable
     data object AuditTrailRoute: Route
-
-    @Serializable
-    data class BookDetail(val id: String): Route
 
     @Serializable
     data class StaffDetailRoute(val staffId: String): Route

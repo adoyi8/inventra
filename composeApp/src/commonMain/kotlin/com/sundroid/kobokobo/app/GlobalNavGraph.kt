@@ -46,13 +46,11 @@ import androidx.navigation.compose.rememberNavController
 import com.sundroid.kobokobo.admin.presentation.AdminViewModel
 import com.sundroid.kobokobo.auth.GoogleAuthUiProvider
 import com.sundroid.kobokobo.business.presentation.BusinessListViewModel
-import com.sundroid.kobokobo.business.presentation.BusinessViewModel
 import com.sundroid.kobokobo.business.presentation.businessList.BusinessListScreen
 import com.sundroid.kobokobo.core.presentation.components.CustomText
 import com.sundroid.kobokobo.dashboard.presentation.DashboardViewModel
 import com.sundroid.kobokobo.dashboard.presentation.components.ConfirmLogout
 import com.sundroid.kobokobo.dashboard.utils.Util.APP_NAME
-import com.sundroid.kobokobo.dropdowndata.presentation.DropDownSettingsViewModel
 import com.sundroid.kobokobo.login.presentation.UserViewModel
 import com.sundroid.kobokobo.theme.AppTheme
 import com.sundroid.kobokobo.user.presentation.ProfileScreen
@@ -67,7 +65,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun GlobalNavGraph(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, businessViewModel: BusinessViewModel = koinViewModel(), dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(), adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()  ) {
+fun GlobalNavGraph(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()  ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val userState by userViewModel.state.collectAsStateWithLifecycle()
@@ -190,11 +188,11 @@ fun GlobalNavGraph(dashboardViewModel: MutableState<DashboardViewModel?>? = null
                 NavHost(
                     modifier = Modifier.padding(paddingValues),
                     navController = navController,
-                    startDestination = Route.BookGraph
+                    startDestination = Route.RootGraph
                 )
                 {
 
-                    navigation<Route.BookGraph>(
+                    navigation<Route.RootGraph>(
                         startDestination = Route.BusinessListScreenRoute
                     ) {
 

@@ -57,16 +57,11 @@ import com.sundroid.kobokobo.business.data.domain.useCase.FindUserByEmailUseCase
 import com.sundroid.kobokobo.business.data.domain.useCase.GetBusinessesForUserUseCase
 import com.sundroid.kobokobo.business.data.domain.useCase.GetStaffRoleUseCase
 import com.sundroid.kobokobo.business.data.repository.DefaultBusinessRepository
-import com.sundroid.kobokobo.business.network.KtorRemoteBusinessDataSource
-import com.sundroid.kobokobo.business.network.RemoteBusinessDataSource
 import com.sundroid.kobokobo.business.presentation.AddStaffViewModel
 import com.sundroid.kobokobo.business.presentation.BusinessListViewModel
-import com.sundroid.kobokobo.business.presentation.BusinessViewModel
 import com.sundroid.kobokobo.business.presentation.PaymentMethodsViewModel
 import com.sundroid.kobokobo.cart.data.repository.DefaultCartRepository
 import com.sundroid.kobokobo.cart.domain.CartRepository
-import com.sundroid.kobokobo.changePassword.presentation.ChangePasswordViewModel
-import com.sundroid.kobokobo.core.data.HttpClientFactory
 import com.sundroid.kobokobo.damages.data.domain.CreateDamageUseCase
 import com.sundroid.kobokobo.damages.data.domain.DamageRepository
 import com.sundroid.kobokobo.damages.data.domain.GetDamagesUseCase
@@ -78,22 +73,12 @@ import com.sundroid.kobokobo.dashboard.data.repository.DefaultProductRepository
 import com.sundroid.kobokobo.dashboard.domain.ProductRepository
 import com.sundroid.kobokobo.dashboard.presentation.DashboardViewModel
 import com.sundroid.kobokobo.department.DepartmentViewModel
-import com.sundroid.kobokobo.dropdowndata.data.domain.DropDownSettingsRepository
-import com.sundroid.kobokobo.dropdowndata.data.repository.DefaultDropDownSettingsRepository
-import com.sundroid.kobokobo.dropdowndata.network.KtorRemoteDropDownSettingsDataSource
-import com.sundroid.kobokobo.dropdowndata.network.RemoteDropDownSettingsDataSource
-import com.sundroid.kobokobo.dropdowndata.presentation.DropDownSettingsViewModel
 import com.sundroid.kobokobo.expense.data.repository.DefaultExpenseRepository
 import com.sundroid.kobokobo.expense.domain.CreateExpenseUseCase
 import com.sundroid.kobokobo.expense.domain.ExpenseRepository
 import com.sundroid.kobokobo.expense.domain.GetExpenseCategoriesUseCase
 import com.sundroid.kobokobo.expense.domain.GetExpensesUseCase
 import com.sundroid.kobokobo.expense.presentation.ExpenseViewModel
-import com.sundroid.kobokobo.heldOrder.data.domain.HeldOrderRepository
-import com.sundroid.kobokobo.heldOrder.data.network.KtorRemoteHeldOrderDataSource
-import com.sundroid.kobokobo.heldOrder.data.network.RemoteHeldOrderDataSource
-import com.sundroid.kobokobo.heldOrder.data.repository.DefaultHeldOrderRepository
-import com.sundroid.kobokobo.heldOrder.presentation.HeldOrderViewModel
 import com.sundroid.kobokobo.inventory.data.domain.repository.InventoryRepository
 import com.sundroid.kobokobo.inventory.data.domain.useCase.CreateCategoryUseCase
 import com.sundroid.kobokobo.inventory.data.domain.useCase.CreateLocationUseCase
@@ -127,14 +112,11 @@ import com.sundroid.kobokobo.inventory.presentation.ProductFormViewModel
 import com.sundroid.kobokobo.inventory.presentation.ProductListViewModel
 import com.sundroid.kobokobo.inventory.presentation.StockTransferViewModel
 import com.sundroid.kobokobo.login.presentation.UserViewModel
-import com.sundroid.kobokobo.splashScreen.presentation.SplashScreenViewModel
 import com.sundroid.kobokobo.transactionHistory.data.repository.DefaultTransactionHistoryRepository
 import com.sundroid.kobokobo.transactionHistory.domain.TransactionHistoryRepository
 import com.sundroid.kobokobo.transactionHistory.presentation.TransactionHistoryViewModel
 import com.sundroid.kobokobo.user.data.database.UserDatabase
 import com.sundroid.kobokobo.user.data.database.UserDatabaseFactory
-import com.sundroid.kobokobo.user.data.network.KtorRemoteUserDataSource
-import com.sundroid.kobokobo.user.data.network.RemoteUserDataSource
 import com.sundroid.kobokobo.user.data.repository.DefaultUserRepository
 import com.sundroid.kobokobo.user.domain.UserRepository
 import com.sundroid.kobokobo.hotel.data.repository.FirebaseHotelRepository
@@ -163,26 +145,16 @@ import org.koin.dsl.module
 expect val platformModule: Module
 
 val sharedModule = module {
-    single { HttpClientFactory.create(get()) }
 
     singleOf(::DefaultUserRepository).bind<UserRepository>()
-    singleOf(::KtorRemoteUserDataSource).bind<RemoteUserDataSource>()
     singleOf(::DefaultProductRepository).bind<ProductRepository>()
     // --- ADD EXPENSE REPOSITORY ---
     singleOf(::DefaultExpenseRepository).bind<ExpenseRepository>()
-    // RemoteProductDataSource no longer used for products; Firestore used instead
     singleOf(::DefaultCartRepository).bind<CartRepository>()
-    // RemoteCartDataSource no longer used for cart; Firestore used instead
     singleOf(::DefaultTransactionHistoryRepository).bind<TransactionHistoryRepository>()
-    // RemoteTransactionHistoryDataSource no longer used; Firestore used instead
-    singleOf(::DefaultHeldOrderRepository).bind<HeldOrderRepository>()
-    singleOf(::KtorRemoteHeldOrderDataSource).bind<RemoteHeldOrderDataSource>()
     singleOf(::DefaultBusinessRepository).bind<BusinessRepository>()
-    singleOf(::KtorRemoteBusinessDataSource).bind<RemoteBusinessDataSource>()
     singleOf(::DefaultInventoryRepository).bind<InventoryRepository>()
 
-    singleOf(::DefaultDropDownSettingsRepository).bind<DropDownSettingsRepository>()
-    singleOf(::KtorRemoteDropDownSettingsDataSource).bind<RemoteDropDownSettingsDataSource>()
     
     // Laundry Management
     singleOf(::LaundryRepositoryImpl).bind<LaundryRepository>()
@@ -309,13 +281,8 @@ val sharedModule = module {
 
 
     viewModelOf(::UserViewModel)
-    viewModelOf(::SplashScreenViewModel)
     viewModelOf(::DashboardViewModel)
     viewModelOf(::TransactionHistoryViewModel)
-    viewModelOf(::HeldOrderViewModel)
-    viewModelOf(::ChangePasswordViewModel)
-    viewModelOf(::BusinessViewModel)
-    viewModelOf(::DropDownSettingsViewModel)
     viewModelOf(::AdminViewModel)
     viewModelOf(::BusinessListViewModel)
     viewModelOf(::RolePermissionViewModel)

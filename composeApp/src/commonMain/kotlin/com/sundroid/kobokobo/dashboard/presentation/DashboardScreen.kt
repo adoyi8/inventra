@@ -47,11 +47,9 @@ import com.sundroid.kobokobo.cart.presentation.components.PaymentMethodNotAvaila
 import com.sundroid.kobokobo.cart.presentation.components.PostingSalesDialog
 import com.sundroid.kobokobo.cart.presentation.components.ReceiptDialog
 import com.sundroid.kobokobo.core.presentation.components.CustomText
-import com.sundroid.kobokobo.dashboard.presentation.components.ChangePasswordDialog
 import com.sundroid.kobokobo.dashboard.presentation.components.ConfirmLogout
 import com.sundroid.kobokobo.dashboard.presentation.components.POSSCreenBody
 import com.sundroid.kobokobo.dashboard.presentation.components.SavingSalesDialog
-import com.sundroid.kobokobo.heldOrder.presentation.HeldOrderScreen
 import com.sundroid.kobokobo.hotel.presentation.HotelMainScreen
 import com.sundroid.kobokobo.login.presentation.UserViewModel
 import com.sundroid.kobokobo.savedSales.presentation.SavedSalesScreen
@@ -136,31 +134,17 @@ fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
-                    HeldOrderScreen(dashboardViewModel = viewModel)
+                    TransactionScreen(userViewModel= userViewModel)
                 }
                 AnimatedVisibility(
                     visible = state.value.selectedMenuIndex.currentState == 2,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
-                    TransactionScreen(userViewModel= userViewModel)
-                }
-                AnimatedVisibility(
-                    visible = state.value.selectedMenuIndex.currentState == 3,
-                    enter = slideInHorizontally(),
-                    exit = slideOutHorizontally()
-                ) {
                     SavedSalesScreen(viewModel = viewModel)
                 }
                 AnimatedVisibility(
-                    visible = state.value.selectedMenuIndex.currentState == 4,
-                    enter = slideInHorizontally(),
-                    exit = slideOutHorizontally()
-                ) {
-                    SettingsScreen(viewModel)
-                }
-                AnimatedVisibility(
-                    visible = state.value.selectedMenuIndex.currentState == 5,
+                    visible = state.value.selectedMenuIndex.currentState == 3,
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally()
                 ) {
@@ -177,7 +161,6 @@ fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
                     }
                 }
                 ConfirmLogout(viewModel = userViewModel)
-                ChangePasswordDialog(viewModel = viewModel)
                 SavingSalesDialog(viewModel = viewModel)
 
             }
@@ -197,42 +180,10 @@ fun POScreen(viewModel: DashboardViewModel, userViewModel: UserViewModel) {
     }
 }
 
-
-
-@Composable
-fun SettingsScreen(viewModel: DashboardViewModel) {
-    Scaffold(topBar = {
-    }) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Card(
-                modifier = Modifier
-                    .width(250.dp)
-                    .clickable { viewModel.showChangePasswordDialog() },
-                shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                CustomText(
-                    text = "Change Password",
-                    style = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
-    }
-}
-
 @Composable
 fun MobileBottomNavigation(viewModel: DashboardViewModel, selectedIndex: Int) {
     // Assuming you have a list of items for your TopMenu
-    val menuItems = listOf("POS", "Held", "Transactions", "Saved", "Settings", "Hotel")
+    val menuItems = listOf("POS", "Transactions", "Saved", "Hotel")
 
     NavigationBar {
         menuItems.forEachIndexed { index, title ->
@@ -246,10 +197,8 @@ fun MobileBottomNavigation(viewModel: DashboardViewModel, selectedIndex: Int) {
                         imageVector = when (index) {
                             0 -> Icons.Default.Menu
                             1 -> Icons.Default.Star
-                            2 -> Icons.Default.Star
-                            3 -> Icons.Default.Clear
-                            4 -> Icons.Default.ArrowDropDown
-                            5 -> Icons.Default.Home // Hotel Icon
+                            2 -> Icons.Default.Clear
+                            3 -> Icons.Default.Home // Hotel Icon
                             else -> Icons.Default.Clear
                         },
                         contentDescription = title

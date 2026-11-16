@@ -39,10 +39,8 @@ import com.sundroid.kobokobo.app.BusinessNavigationGraph
 import com.sundroid.kobokobo.app.GlobalNavGraph
 import com.sundroid.kobokobo.auth.GoogleAuthUiProvider
 import com.sundroid.kobokobo.business.presentation.BusinessListViewModel
-import com.sundroid.kobokobo.business.presentation.BusinessViewModel
 import com.sundroid.kobokobo.dashboard.presentation.DashboardViewModel
 import com.sundroid.kobokobo.dashboard.utils.Util.APP_NAME
-import com.sundroid.kobokobo.dropdowndata.presentation.DropDownSettingsViewModel
 import com.sundroid.kobokobo.login.presentation.UserViewModel
 import com.sundroid.kobokobo.theme.AppTheme
 import inventrar.composeapp.generated.resources.Res
@@ -54,7 +52,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SplashScreenRoot(
-    dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, businessViewModel: BusinessViewModel, dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(), adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()
+    dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()
 
 )
 {
@@ -71,8 +69,6 @@ fun SplashScreenRoot(
                     AuthNavGraph(
                         dashboardViewModel = dashboardViewModel,
                         userViewModel = userViewModel,
-                        businessViewModel = businessViewModel,
-                        dropDownSettingsViewModel = dropDownSettingsViewModel,
                         adminViewModel = adminViewModel,
                         googleAuthUiProvider = googleAuthUiProvider,
                         businessListViewModel = businessListViewModel,
@@ -85,8 +81,6 @@ fun SplashScreenRoot(
                     GlobalNavGraph(
                         dashboardViewModel = dashboardViewModel,
                         userViewModel = userViewModel,
-                        businessViewModel = businessViewModel,
-                        dropDownSettingsViewModel = dropDownSettingsViewModel,
                         adminViewModel = adminViewModel,
                         googleAuthUiProvider = googleAuthUiProvider,
                         businessListViewModel = businessListViewModel,
@@ -98,8 +92,6 @@ fun SplashScreenRoot(
                 else -> {
                     BusinessNavigationGraph(
                         userViewModel = userViewModel,
-                        businessViewModel = businessViewModel,
-                        dropDownSettingsViewModel = dropDownSettingsViewModel,
                         adminViewModel = adminViewModel,
                         googleAuthUiProvider = googleAuthUiProvider,
                         businessListViewModel = businessListViewModel,

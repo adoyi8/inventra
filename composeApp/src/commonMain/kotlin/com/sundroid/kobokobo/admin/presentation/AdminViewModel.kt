@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sundroid.kobokobo.auth.GoogleAuthUiProvider
 import com.sundroid.kobokobo.business.presentation.BusinessState
-import com.sundroid.kobokobo.business.presentation.CreateBusinessFormState
 import com.sundroid.kobokobo.core.domain.onError
 import com.sundroid.kobokobo.core.domain.onSuccess
 import com.sundroid.kobokobo.inventory.data.domain.repository.InventoryRepository
@@ -23,13 +22,11 @@ class AdminViewModel(
     private val _inventoryItemState = MutableStateFlow(AddInventoryItemFormState())
     val inventoryItemState = _inventoryItemState.asStateFlow()
 
-    private val _createBusinessFormState = MutableStateFlow(CreateBusinessFormState())
 
     var googleAuthUIProvider : GoogleAuthUiProvider? = null
 
     val state = _state.asStateFlow()
 
-    val createBusinessFormState = _createBusinessFormState.asStateFlow()
 
 
 //    fun addInventoryItem(user: User) {

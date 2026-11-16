@@ -3,22 +3,9 @@ package com.sundroid.kobokobo.user.data.mappers
 
 import com.google.firebase.auth.FirebaseUser
 import com.sundroid.kobokobo.user.data.database.UserEntity
-import com.sundroid.kobokobo.user.data.dto.UserLoginResponseDto
 import com.sundroid.kobokobo.user.domain.User
 
 
-fun UserLoginResponseDto.toUser(): User {
-
-    return User(
-        firstname= employee?.firstName,
-    lastname = employee?.lastName,
-     email  = employee?.emailAddress,
-     roleId  = employee?.roleId,
-    countryId = employee?.countryId,
-     cityId = employee?.countryId,
-        userId = employee?.employeeId
-    )
-}
 fun FirebaseUser.toUser(): User {
 
     return User(

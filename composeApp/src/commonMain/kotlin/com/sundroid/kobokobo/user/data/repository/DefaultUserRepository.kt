@@ -10,10 +10,8 @@ import com.sundroid.kobokobo.core.domain.EmptyResult
 import com.sundroid.kobokobo.core.domain.Result
 import com.sundroid.kobokobo.core.domain.map
 import com.sundroid.kobokobo.user.data.database.UserDao
-import com.sundroid.kobokobo.user.data.dto.UserLoginResponseDto
 import com.sundroid.kobokobo.user.data.mappers.toUser
 import com.sundroid.kobokobo.user.data.mappers.toUserEntity
-import com.sundroid.kobokobo.user.data.network.RemoteUserDataSource
 import com.sundroid.kobokobo.user.domain.User
 import com.sundroid.kobokobo.user.domain.UserRepository
 import kotlinx.coroutines.channels.awaitClose
@@ -23,36 +21,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 class DefaultUserRepository(
-    private val remoteUserDataSource: RemoteUserDataSource,
     private val userDao: UserDao,
     private val firestore: FirebaseFirestore
 ): UserRepository {
-
-    override suspend fun login(username: String, password: String): Result<UserLoginResponseDto, DataError> {
-       // val localResult = favoriteBookDao.getFavoriteBook(bookId)
-
-        //return if(localResult == null) {
-         val response =   remoteUserDataSource
-                .login(username, password)
-                .map {
-                    it
-                }
-        return response
-    }
-
-    override suspend fun changePassword(
-        oldPassword: String,
-        newPassword: String,
-        confirmPassword: String
-    ): Result<ResponseDto?, DataError> {
-        val response =   remoteUserDataSource
-            .changePassword(oldPassword, newPassword, confirmPassword)
-            .map {
-                it
-            }
-
-        return response
-    }
 
      override fun getAllUsers(): Flow<List<User>> {
         return userDao

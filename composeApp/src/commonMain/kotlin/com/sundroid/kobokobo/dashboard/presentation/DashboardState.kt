@@ -25,7 +25,6 @@ data class DashboardState (
     val allProducts: List<Product> = emptyList(),
     val visibleProducts: List<Product> = emptyList(),
     var showConfirmLogout: Boolean = false,
-    var showChangePasswordDialog: Boolean = false,
     var selectedMenuIndex : MutableTransitionState<Int> = MutableTransitionState(0),
     val cartItems: MutableList<CartItem> = mutableListOf(),
     var paymentMethod: String = "",
@@ -43,10 +42,9 @@ data class DashboardState (
     val snackBarMessage: String = "",
     val reference: String = "",
     val menu: List<MenuItem> = listOf<MenuItem>(
-        MenuItem("Point of Sale", imageUrl = ""), MenuItem("Paused Orders", imageUrl = ""),
+        MenuItem("Point of Sale", imageUrl = ""),
         MenuItem("Transaction History", imageUrl = "", ),
-        MenuItem("Saved Sales", imageUrl = ""),
-        MenuItem("Settings", imageUrl = "",)
+        MenuItem("Saved Sales", imageUrl = "")
     ),
     val showCartSheet: Boolean =false,
     val heldCarts: List<HeldCartEntity> = emptyList(),

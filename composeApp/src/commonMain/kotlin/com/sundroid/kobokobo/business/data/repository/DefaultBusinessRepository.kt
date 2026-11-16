@@ -13,16 +13,9 @@ import com.sundroid.kobokobo.business.data.domain.BusinessRepository
 import com.sundroid.kobokobo.business.data.domain.model.AppUser
 import com.sundroid.kobokobo.business.data.domain.model.PaymentMethod
 import com.sundroid.kobokobo.business.data.domain.model.Staff
-import com.sundroid.kobokobo.business.data.dto.CreateBusinessRequest
-import com.sundroid.kobokobo.business.data.dto.OrganizationResponse
-import com.sundroid.kobokobo.business.data.dto.SearchOrganizationRequest
-import com.sundroid.kobokobo.business.network.RemoteBusinessDataSource
-import com.sundroid.kobokobo.core.data.dto.ResponseDto
 import com.sundroid.kobokobo.core.domain.DataError
 import com.sundroid.kobokobo.core.domain.EmptyResult
 import com.sundroid.kobokobo.core.domain.Result
-import com.sundroid.kobokobo.heldOrder.data.dto.SingleHeldOrderDto
-import com.sundroid.kobokobo.heldOrder.data.dto.VoidOrderRequest
 import com.sundroid.kobokobo.inventory.data.domain.model.getDefaultInventory
 import com.sundroid.kobokobo.utils.StringUtil.BUSINESS_COLLECTION
 import com.sundroid.kobokobo.utils.StringUtil.CATEGORIES_COLLECTION
@@ -33,33 +26,14 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class DefaultBusinessRepository(
-    private val remoteBusinessDataSource: RemoteBusinessDataSource,
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
     private val businessDao: BusinessDao,
 ): BusinessRepository {
-    override suspend fun getSingleHeldOrder(
-        accessToken: String,
-        request: VoidOrderRequest
-    ): Result<SingleHeldOrderDto, DataError.Remote> {
-        TODO("Not yet implemented")
-    }
 
 
-    override suspend fun getBusinesses(accessToken: String, paginationRequest: SearchOrganizationRequest): Result<OrganizationResponse, DataError.Remote> {
-        return remoteBusinessDataSource.getBusiness(accessToken, paginationRequest)
-    }
 
-    override suspend fun createBusiness(accessToken: String, createBusinessRequest: CreateBusinessRequest): Result<ResponseDto, DataError.Remote> {
-       return remoteBusinessDataSource.createBusiness(accessToken, createBusinessRequest)
-    }
 
-    override suspend fun voidOrder(
-        accessToken: String,
-        voidOrderRequest: VoidOrderRequest
-    ): Result<ResponseDto, DataError.Remote> {
-        TODO("Not yet implemented")
-    }
     override suspend fun getBusinessesForUser(userId: String): kotlin.Result<List<Business>> = runCatching {
         // 1. Find all staff entries for the user
 

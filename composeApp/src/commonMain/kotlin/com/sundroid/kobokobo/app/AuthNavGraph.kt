@@ -12,11 +12,9 @@ import androidx.navigation.compose.rememberNavController
 import com.sundroid.kobokobo.admin.presentation.AdminViewModel
 import com.sundroid.kobokobo.auth.GoogleAuthUiProvider
 import com.sundroid.kobokobo.business.presentation.BusinessListViewModel
-import com.sundroid.kobokobo.business.presentation.BusinessViewModel
 import com.sundroid.kobokobo.core.presentation.NavigationViewModel
 import com.sundroid.kobokobo.dashboard.presentation.DashboardViewModel
 import com.sundroid.kobokobo.dashboard.presentation.components.ConfirmLogout
-import com.sundroid.kobokobo.dropdowndata.presentation.DropDownSettingsViewModel
 import com.sundroid.kobokobo.login.presentation.LoginAction
 import com.sundroid.kobokobo.login.presentation.LoginScreenRoot
 import com.sundroid.kobokobo.login.presentation.UserViewModel
@@ -26,7 +24,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
-fun AuthNavGraph(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, businessViewModel: BusinessViewModel = koinViewModel(), dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(), adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()  ) {
+fun AuthNavGraph(dashboardViewModel: MutableState<DashboardViewModel?>? = null, userViewModel: UserViewModel, adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel()  ) {
     AppTheme {
         val navController = rememberNavController()
 
@@ -37,10 +35,10 @@ fun AuthNavGraph(dashboardViewModel: MutableState<DashboardViewModel?>? = null, 
 
         NavHost(
             navController = navController,
-            startDestination = Route.BookGraph
+            startDestination = Route.RootGraph
         ) {
 
-            navigation<Route.BookGraph>(
+            navigation<Route.RootGraph>(
                 startDestination = Route.Login
             ) {
                 composable<Route.Login>(

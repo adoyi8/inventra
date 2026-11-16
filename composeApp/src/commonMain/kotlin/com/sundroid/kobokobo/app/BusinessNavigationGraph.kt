@@ -62,7 +62,6 @@ import com.sundroid.kobokobo.audit.presentation.AuditTrailViewModel
 import com.sundroid.kobokobo.auth.GoogleAuthUiProvider
 import com.sundroid.kobokobo.business.presentation.AddStaffViewModel
 import com.sundroid.kobokobo.business.presentation.BusinessListViewModel
-import com.sundroid.kobokobo.business.presentation.BusinessViewModel
 import com.sundroid.kobokobo.business.presentation.PaymentMethodsScreen
 import com.sundroid.kobokobo.business.presentation.PaymentMethodsViewModel
 import com.sundroid.kobokobo.business.presentation.addStaff.AddStaffScreen
@@ -77,7 +76,6 @@ import com.sundroid.kobokobo.dashboard.utils.Util.APP_NAME
 import com.sundroid.kobokobo.department.CreateEditDepartmentScreen
 import com.sundroid.kobokobo.department.DepartmentListScreen
 import com.sundroid.kobokobo.department.DepartmentViewModel
-import com.sundroid.kobokobo.dropdowndata.presentation.DropDownSettingsViewModel
 import com.sundroid.kobokobo.expense.presentation.ExpenseScreen
 import com.sundroid.kobokobo.expense.presentation.ExpenseViewModel
 import com.sundroid.kobokobo.inventory.presentation.CategoryFormScreen
@@ -111,7 +109,7 @@ import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BusinessNavigationGraph(dashboardViewModel: DashboardViewModel = koinViewModel<DashboardViewModel>(), userViewModel: UserViewModel, businessViewModel: BusinessViewModel = koinViewModel(), dropDownSettingsViewModel: DropDownSettingsViewModel = koinViewModel(), adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel(), departmentViewModel: DepartmentViewModel = koinViewModel()) {
+fun BusinessNavigationGraph(dashboardViewModel: DashboardViewModel = koinViewModel<DashboardViewModel>(), userViewModel: UserViewModel, adminViewModel: AdminViewModel = koinViewModel(), googleAuthUiProvider: GoogleAuthUiProvider, businessListViewModel: BusinessListViewModel = koinViewModel(), departmentViewModel: DepartmentViewModel = koinViewModel()) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val userState by userViewModel.state.collectAsState()
@@ -409,13 +407,13 @@ fun BusinessNavigationGraph(dashboardViewModel: DashboardViewModel = koinViewMod
 
                 NavHost(
                     navController = navController,
-                    startDestination = Route.BookGraph,
+                    startDestination = Route.RootGraph,
                     modifier = Modifier.padding(paddingValues)
                 )
                 {
 
 
-                    navigation<Route.BookGraph>(
+                    navigation<Route.RootGraph>(
                         startDestination = if(userState.permissions.contains(SystemPermissions.PROCESS_SALES.id) && hasSalesFeature) Route.POSScreen else if(userState.permissions.contains(SystemPermissions.ADD_HOTEL_BOOKINGS.id) && hasHotelFeature) Route.HotelRoute else Route.UserProfileRoute
 
                     ){
@@ -731,7 +729,6 @@ fun BusinessNavigationGraph(dashboardViewModel: DashboardViewModel = koinViewMod
                                 exitTransition = { slideOutHorizontally() },
                                 popEnterTransition = { slideInHorizontally() }
                             ) {
-                                // ShrineProfileApp(userViewModel = userViewModel, businessViewModel = businessViewModel, dropDownSettingsViewModel = dropDownSettingsViewModel)
                                 CreateInventoryForm(
                                     adminViewModel = adminViewModel,
                                     userViewModel = userViewModel
